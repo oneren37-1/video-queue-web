@@ -8,11 +8,16 @@ const UploadFile = () => {
     const [sendingProgress, setSendingProgress] = React.useState<number>(0);
 
     const [socket] = React.useState<WebSocket>(useWebsocket());
-    const [peerConnection, setPeerConnection] = React.useState<RTCPeerConnection>(new RTCPeerConnection());
+    const [peerConnection, setPeerConnection] = React.useState<RTCPeerConnection | null>(null);
     const [dataChannel, setDataChannel] = React.useState<RTCDataChannel | null>(null);
 
 
     React.useEffect(() => {
+        if (!peerConnection) {
+            setPeerConnection(new RTCPeerConnection())
+            return;
+        }
+
         if (!dataChannel) {
             setDataChannel(peerConnection.createDataChannel('dataChannel'));
             return;
@@ -89,7 +94,7 @@ const UploadFile = () => {
 
 
     const createOffer = React.useCallback(async () => {
-        if (!dataChannel) return
+        if (!peerConnection || !dataChannel) return
         if (dataChannel.readyState === 'open') return;
         const offer = await peerConnection.createOffer();
         await peerConnection.setLocalDescription(offer)
@@ -110,14 +115,14 @@ const UploadFile = () => {
     }, [peerConnection, dataChannel])
 
     async function handleAnswer(answer:any) {
-        console.log(peerConnection.connectionState)
-        console.log(peerConnection.iceConnectionState)
-        console.log(peerConnection.localDescription)
+        // console.log(peerConnection.connectionState)
+        // console.log(peerConnection.iceConnectionState)
+        // console.log(peerConnection.localDescription)
 
         // @ts-ignore
         window.pc = peerConnection;
 
-        await peerConnection.setRemoteDescription(JSON.parse(answer))
+        await peerConnection?.setRemoteDescription(JSON.parse(answer))
             .then(() => {
                 console.log('Answer set');
                 // console.log(peerConnection.connectionState)
@@ -133,7 +138,7 @@ const UploadFile = () => {
     function closeDataChannels() {
         console.log('Closing data channels');
         dataChannel?.close();
-        peerConnection.close();
+        peerConnection?.close();
         console.log('Closed peer connections');
     }
 
@@ -190,7 +195,7 @@ const UploadFile = () => {
             dataChannel.send(e.target.result);
             // @ts-ignore
             offset += e.target.result.byteLength;
-            // setSendingProgress(offset/file.size);
+            setSendingProgress(offset/file.size*100);
             // sendProgress.value = offset;
             if (offset < file.size) {
                 readSlice(offset);
