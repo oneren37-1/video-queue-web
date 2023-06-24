@@ -3,99 +3,93 @@ import {Button, Card, Form, ProgressBar} from "react-bootstrap";
 import {useWebsocket} from "../app/hooks";
 
 const UploadFile = () => {
-    const socket = useWebsocket();
 
-    // const [sendingStatus, setSendingStatus] = React.useState<string>('idle');
-    // const [sendingProgress, setSendingProgress] = React.useState<number>(0);
+    const [sendingStatus, setSendingStatus] = React.useState<string>('idle');
+    const [sendingProgress, setSendingProgress] = React.useState<number>(0);
+
+    const [socket] = React.useState<WebSocket>(useWebsocket());
+    const [peerConnection, setPeerConnection] = React.useState<RTCPeerConnection>(new RTCPeerConnection());
+    const [dataChannel, setDataChannel] = React.useState<RTCDataChannel | null>(null);
+
 
     React.useEffect(() => {
-        const wsMessageListener = (event: any) => {
-            try {
-                // console.log("Получены данные ws " + event.data);
-                const data = JSON.parse(event.data)
-                switch (data.type) {
-                    case 'info':
-                        if (data.message = 'Client connected') {
-                            // createOffer()
-                        }
-                        break
-                    case 'answer':
-                        console.log('Answer received')
-                        console.log(peerConnection.localDescription)
-                        // console.log(data.answer)
-                        handleAnswer(data.answer)
-                        break
+        if (!dataChannel) {
+            setDataChannel(peerConnection.createDataChannel('dataChannel'));
+            return;
+        }
 
-                    case 'iceCandidate':
-                        // console.log('Ice candidate received')
-                        // console.log(data.iceCandidate)
-                        const parsed = JSON.parse(data.iceCandidate)
-                        const candidate = new RTCIceCandidate({
-                            candidate: parsed.candidate,
-                            sdpMid: parsed.sdpMid,
-                            sdpMLineIndex: parsed.sdpMLineIndex
-                        })
-                        // console.log(candidate);
-                        try {
-                            peerConnection.addIceCandidate(candidate)
-                        }
-                        catch (e) {
-                            console.log(e)
-                        }
-                        break
-                }
+        dataChannel.onopen = () => {
+            console.log('data channel is open and ready to be used')
+            handleSend()
+        }
+        dataChannel.onmessage = (event) => {
+            console.log("Message: " + event.data);
+        }
+        dataChannel.onerror = (event:any) => {
+            console.log(`Произошла ошибка: ${event.error}`);
+        };
+
+        peerConnection.onconnectionstatechange = (event) => {
+            console.log('Connection state change: ' + peerConnection.connectionState)
+        }
+        peerConnection.onicecandidate = (event) => {
+            if (event.candidate) {
+                console.log("New ICE candidate: " + JSON.stringify(peerConnection.localDescription));
+                console.log(event.candidate);
+
+                socket.send(JSON.stringify({
+                    role: 'client',
+                    type: 'iceCandidate',
+                    hostID: '123',
+                    message: JSON.stringify({
+                        type: 'iceCandidate',
+                        payload: JSON.stringify(event.candidate)
+                    })
+                }))
             }
-            catch (e) {
-                console.log(e)
+        }
+
+        const wsMessageListener = function (event: any) {
+            console.log("Получены данные ws " + event.data);
+            const data = JSON.parse(event.data)
+            switch (data.type) {
+                case 'answer':
+                    console.log('Answer received')
+                    // console.log(data.answer)
+                    handleAnswer(data.answer)
+                    break
+
+                case 'iceCandidate':
+                    // console.log('Ice candidate received')
+                    // console.log(data.iceCandidate)
+                    const parsed = JSON.parse(data.iceCandidate)
+                    const candidate = new RTCIceCandidate({
+                        candidate: parsed.candidate,
+                        sdpMid: parsed.sdpMid,
+                        sdpMLineIndex: parsed.sdpMLineIndex
+                    })
+                    // console.log(candidate);
+                    try {
+                        peerConnection.addIceCandidate(candidate)
+                    }
+                    catch (e) {
+                        console.log(e)
+                    }
+                    break
             }
         }
         socket.addEventListener('message', wsMessageListener);
 
         return () => {
+            console.log('unmount')
             socket.removeEventListener('message', wsMessageListener);
             // closeDataChannels();
         }
-    }, [])
-
-    let peerConnection = new RTCPeerConnection();
+    }, [dataChannel, peerConnection])
 
 
-    // @ts-ignore
-    window.pc = peerConnection;
-
-    let dataChannel = peerConnection.createDataChannel('test');
-
-    dataChannel.onopen = () => {
-        console.log('data channel is open and ready to be used')
-        handleSend()
-    }
-    dataChannel.onmessage = (event) => {
-        console.log("Message: " + event.data);
-    }
-    dataChannel.onerror = (event:any) => {
-        console.log(`Произошла ошибка: ${event.error}`);
-    };
-    peerConnection.onconnectionstatechange = (event) => {
-        console.log('Connection state change: ' + peerConnection.connectionState)
-    }
-    peerConnection.onicecandidate = (event) => {
-        if (event.candidate) {
-            // console.log("New ICE candidate: " + JSON.stringify(peerConnection.localDescription));
-            // console.log(event.candidate);
-
-            socket.send(JSON.stringify({
-                role: 'client',
-                type: 'iceCandidate',
-                hostID: '123',
-                message: JSON.stringify({
-                    type: 'iceCandidate',
-                    payload: JSON.stringify(event.candidate)
-                })
-            }))
-        }
-    }
-
-    async function createOffer() {
+    const createOffer = React.useCallback(async () => {
+        if (!dataChannel) return
         if (dataChannel.readyState === 'open') return;
         const offer = await peerConnection.createOffer();
         await peerConnection.setLocalDescription(offer)
@@ -112,14 +106,17 @@ const UploadFile = () => {
                     })
                 }))
                 console.log(peerConnection.localDescription)
-
             })
-    }
+    }, [peerConnection, dataChannel])
 
     async function handleAnswer(answer:any) {
         console.log(peerConnection.connectionState)
         console.log(peerConnection.iceConnectionState)
         console.log(peerConnection.localDescription)
+
+        // @ts-ignore
+        window.pc = peerConnection;
+
         await peerConnection.setRemoteDescription(JSON.parse(answer))
             .then(() => {
                 console.log('Answer set');
@@ -135,31 +132,21 @@ const UploadFile = () => {
 
     function closeDataChannels() {
         console.log('Closing data channels');
-        dataChannel.close();
-        console.log(`Closed data channel with label: ${dataChannel.label}`);
-        // @ts-ignore
-        dataChannel = null;
+        dataChannel?.close();
         peerConnection.close();
-        // @ts-ignore
-        peerConnection = null;
         console.log('Closed peer connections');
-
-        // // re-enable the file select
-        // fileInput.disabled = false;
-        // abortButton.disabled = true;
-        // sendFileButton.disabled = false;
     }
 
     const handleSend = () => {
-        // setSendingStatus("sending");
-        if (dataChannel.readyState === "open") {
+        setSendingStatus("sending");
+        if (dataChannel?.readyState === "open") {
             sendData();
         }
         createOffer();
     }
 
     const handleAbort = () => {
-        dataChannel.send(JSON.stringify({
+        dataChannel?.send(JSON.stringify({
             type: 'abortSending',
             payload: {}
         }));
@@ -174,7 +161,7 @@ const UploadFile = () => {
         const file:File = fileInput.current && fileInput.current.files[0];
         console.log(`File is ${[file.name, file.size, file.type, file.lastModified].join(' ')}`);
 
-        dataChannel.send(JSON.stringify({
+        dataChannel?.send(JSON.stringify({
             type: 'startSending',
             payload: {
                 name: file.name,
@@ -237,20 +224,20 @@ const UploadFile = () => {
                             <Form.Control
                                 type="file"
                                 ref={fileInput}
-                                // onChange={() => setSendingStatus("ready")}
-                                // style={{
-                                //     visibility: sendingStatus !== "sending" ? "visible" : "hidden"
-                                // }}
+                                onChange={() => setSendingStatus("ready")}
+                                style={{
+                                    visibility: sendingStatus !== "sending" ? "visible" : "hidden"
+                                }}
                             />
-                            {/*{sendingStatus == "ready" && (*/}
+                            {sendingStatus == "ready" && (
                                 <Button onClick={handleSend}>Отправить</Button>
-                            {/*)}*/}
-                            {/*{sendingStatus == "sending" && (*/}
+                            )}
+                            {sendingStatus == "sending" && (
                                 <>
-                                    {/*<ProgressBar now={sendingProgress} label={`${sendingProgress}%`} />*/}
+                                    <ProgressBar now={sendingProgress} label={`${sendingProgress}%`} />
                                     <Button onClick={handleAbort}>Отменить</Button>
                                 </>
-                            {/*)}*/}
+                            )}
                         </div>
                     </section>
                 </Card.Text>
