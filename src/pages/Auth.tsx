@@ -1,9 +1,10 @@
 import React from 'react'
 import {Button, Card, Form, Container, Alert} from 'react-bootstrap'
 import {SubmitHandler, useForm} from "react-hook-form";
-import {useAppDispatch, useAppSelector} from "../../app/hooks";
-import { RootState } from '../../app/store';
-import {login, logout} from "../../store/auth";
+import {useAppDispatch, useAppSelector} from "../app/hooks";
+import { RootState } from '../app/store';
+import {login, logout} from "../store/auth";
+import {useNavigate} from "react-router-dom";
 
 type Inputs = {
     hostId: string
@@ -13,6 +14,7 @@ type Inputs = {
 const Auth = () => {
 
     const dispatch = useAppDispatch();
+    const navigate = useNavigate();
     const authStatus = useAppSelector((state: RootState) => state.auth.status);
 
     const {
@@ -25,6 +27,10 @@ const Auth = () => {
     const onSubmit: SubmitHandler<Inputs> = (data) => {
         dispatch(login(data))
     }
+
+    React.useEffect(() => {
+        if (authStatus === 'ok') navigate('/')
+    }, [authStatus])
 
     return (
         <Container fluid className="vh-100 d-flex align-items-center justify-content-center">

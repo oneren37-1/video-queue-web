@@ -1,9 +1,10 @@
 import React from 'react';
-import {Button, Container, Form, Nav, Navbar, NavDropdown, Offcanvas} from "react-bootstrap";
+import {Button, Container, Form, Nav, Navbar, NavDropdown, Offcanvas, Stack} from "react-bootstrap";
 import {useAppDispatch, useAppSelector} from "../../app/hooks";
 import { useMediaQuery } from 'react-responsive'
 import DisplaysList from "../displaysList/DisplaysList";
 import {logout} from "../../store/auth";
+import {NavLink} from "react-router-dom";
 
 const Header = () => {
     const hostId = useAppSelector((state) => state.auth.hostId);
@@ -13,7 +14,14 @@ const Header = () => {
     return (
         <Navbar bg="light" expand={false} className="mb-3">
             <Container fluid>
-                <Navbar.Brand href="#">{hostId}</Navbar.Brand>
+                <Stack direction="horizontal" gap={2}>
+                    <Navbar.Brand href="/">{hostId}</Navbar.Brand>
+                    <NavLink to={"/media"}>Медиа</NavLink>
+                    <NavLink to={"/queues"}>Очереди</NavLink>
+                    <NavLink to={"/schedulers"}>Планировщики</NavLink>
+                </Stack>
+
+
                 <Button
                     variant="outline-secondary"
                     className="ms-auto"
