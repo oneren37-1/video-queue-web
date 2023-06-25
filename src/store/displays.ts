@@ -42,7 +42,7 @@ export const displaysSlice = createSlice({
 })
 
 export const loadDisplays = createAsyncThunk(
-    'auth/load',
+    'displays/load',
     async (): Promise<any> => {
         return useWSAuthedRequest({
             type: "get",

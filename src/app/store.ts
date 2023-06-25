@@ -1,11 +1,13 @@
 import { configureStore, ThunkAction, Action } from '@reduxjs/toolkit';
 import auth from "../store/auth";
 import displays from "../store/displays";
+import media from "../store/media";
 
 export const store = configureStore({
   reducer: {
     auth,
-    displays
+    displays,
+    media
   },
 });
 

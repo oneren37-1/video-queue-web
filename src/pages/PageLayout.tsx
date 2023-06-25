@@ -16,7 +16,7 @@ const PageLayout = (props: any) => {
     return (
         <>
             <Header />
-            <Container fluid>
+            <Container>
                 { props.children }
             </Container>
         </>

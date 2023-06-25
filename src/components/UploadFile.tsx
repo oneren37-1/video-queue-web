@@ -1,11 +1,13 @@
 import React from 'react';
-import {Button, Card, Form, ProgressBar} from "react-bootstrap";
+import {Alert, Button, Card, Form, ProgressBar, Stack} from "react-bootstrap";
 import {useWebsocket} from "../app/hooks";
 
 const UploadFile = () => {
 
     const [sendingStatus, setSendingStatus] = React.useState<string>('idle');
     const [sendingProgress, setSendingProgress] = React.useState<number>(0);
+    const [fileName, setFileName] = React.useState<string | null>(null);
+
 
     const [socket] = React.useState<WebSocket>(useWebsocket());
     const [peerConnection, setPeerConnection] = React.useState<RTCPeerConnection | null>(null);
@@ -55,7 +57,7 @@ const UploadFile = () => {
         }
 
         const wsMessageListener = function (event: any) {
-            console.log("Получены данные ws " + event.data);
+            //console.log("Получены данные ws " + event.data);
             const data = JSON.parse(event.data)
             switch (data.type) {
                 case 'answer':
@@ -115,12 +117,6 @@ const UploadFile = () => {
     }, [peerConnection, dataChannel])
 
     async function handleAnswer(answer:any) {
-        // console.log(peerConnection.connectionState)
-        // console.log(peerConnection.iceConnectionState)
-        // console.log(peerConnection.localDescription)
-
-        // @ts-ignore
-        window.pc = peerConnection;
 
         await peerConnection?.setRemoteDescription(JSON.parse(answer))
             .then(() => {
@@ -165,6 +161,7 @@ const UploadFile = () => {
         // @ts-ignore
         const file:File = fileInput.current && fileInput.current.files[0];
         console.log(`File is ${[file.name, file.size, file.type, file.lastModified].join(' ')}`);
+        setFileName(file.name)
 
         dataChannel?.send(JSON.stringify({
             type: 'startSending',
@@ -175,28 +172,23 @@ const UploadFile = () => {
             }
         }));
 
-
-        // Handle 0 size files.
         if (file.size === 0) {
             console.log('File is empty, please select a non-empty file');
             closeDataChannels();
             return;
         }
-        // sendProgress.max = file.size;
-        // receiveProgress.max = file.size;
+
         const chunkSize = 16384;
         const fileReader = new FileReader();
         let offset = 0;
         fileReader.addEventListener('error', error => console.error('Error reading file:', error));
         fileReader.addEventListener('abort', event => console.log('File reading aborted:', event));
         fileReader.addEventListener('load', e => {
-            console.log('FileRead.onload ', e);
             // @ts-ignore
             dataChannel.send(e.target.result);
             // @ts-ignore
             offset += e.target.result.byteLength;
             setSendingProgress(offset/file.size*100);
-            // sendProgress.value = offset;
             if (offset < file.size) {
                 readSlice(offset);
             } else {
@@ -209,10 +201,13 @@ const UploadFile = () => {
                         type: file.type,
                     }
                 }));
+                setSendingStatus("complete");
+                setSendingProgress(0);
+                // @ts-ignore
+                fileInput.current.value = null;
             }
         });
         const readSlice = (o:any) => {
-            console.log('readSlice ', o);
             const slice = file.slice(offset, o + chunkSize);
             fileReader.readAsArrayBuffer(slice);
         };
@@ -226,22 +221,32 @@ const UploadFile = () => {
                 <Card.Text>
                     <section>
                         <div>
-                            <Form.Control
-                                type="file"
-                                ref={fileInput}
-                                onChange={() => setSendingStatus("ready")}
-                                style={{
-                                    visibility: sendingStatus !== "sending" ? "visible" : "hidden"
-                                }}
-                            />
-                            {sendingStatus == "ready" && (
-                                <Button onClick={handleSend}>Отправить</Button>
-                            )}
+                            <Stack direction="horizontal" gap={2} style={{width: "100%"}}>
+                                <Form.Control
+                                    type="file"
+                                    ref={fileInput}
+                                    onChange={() => setSendingStatus("ready")}
+                                    style={{
+                                        visibility: sendingStatus !== "sending" ? "visible" : "hidden"
+                                    }}
+                                />
+                                {sendingStatus == "ready" && (
+                                    <Button onClick={handleSend}>Отправить</Button>
+                                )}
+                            </Stack>
                             {sendingStatus == "sending" && (
-                                <>
-                                    <ProgressBar now={sendingProgress} label={`${sendingProgress}%`} />
-                                    <Button onClick={handleAbort}>Отменить</Button>
-                                </>
+                                <Stack direction="horizontal" gap={2} style={{width: "100%"}}>
+                                    <Stack>
+                                        {fileName && (<span>Отправка файла {fileName}</span>)}
+                                        <ProgressBar now={sendingProgress} label={`${Math.round(sendingProgress)}%`} style={{width: "100%"}}/>
+                                    </Stack>
+                                    {/*<Button variant={"outline-secondary"} onClick={handleAbort}>Отменить</Button>*/}
+                                </Stack>
+                            )}
+                            {sendingStatus == "complete" && (
+                                <Alert variant={"success"} className={"mt-2"}>
+                                    Файл {fileName} успешно отправлен
+                                </Alert>
                             )}
                         </div>
                     </section>
