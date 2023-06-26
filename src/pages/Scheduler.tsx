@@ -1,8 +1,9 @@
 import React, {useState} from 'react';
-import {Card, Col, Form} from 'react-bootstrap';
-import ScheduledQueueCard from "../queue/ScheduledQueueCard";
+import {Button, Card, Col, Form} from 'react-bootstrap';
+import ScheduledQueueCard from "../components/queue/ScheduledQueueCard";
 import {Cron} from "react-js-cron";
-import CronHumanize from "../../utils/cronHumanize";
+import CronHumanize from "../utils/cronHumanize";
+import PageLayout from "./PageLayout";
 
 const Scheduler = () => {
 
@@ -32,7 +33,7 @@ const Scheduler = () => {
 
 
     return (
-        <div>
+        <PageLayout>
             <h1>Scheduler</h1>
             <h3 className={"mt-5"}>Заставка</h3>
             <div className={"mb-3"}><span>Заставка воспроизводится если нет текущих запланированных очередей</span></div>
@@ -45,10 +46,11 @@ const Scheduler = () => {
             </Col>
             <h3 className="mt-5">Запланированные очереди</h3>
             <div className={"mb-3"}><span>Очереди расположены в соответсвие с приоритетом. В случае, если на одно время запланировано несколько очередей, будет воспроизведена очередь с большим приоритетом</span></div>
+            <Button>Запланировать</Button>
             {queues.map((queue: any) => (
                 <div className="mb-3"><ScheduledQueueCard {...queue}/></div>
             ))}
-        </div>
+        </PageLayout>
     )
 }
 

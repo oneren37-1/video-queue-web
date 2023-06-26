@@ -3,7 +3,7 @@ import {Col, Container, Nav, Navbar, Row} from "react-bootstrap";
 import Header from "../components/header/Header";
 import {useMediaQuery} from "react-responsive";
 import DisplaysList from "../components/displaysList/DisplaysList";
-import Scheduler from "../components/scheduler/Scheduler";
+import Scheduler from "./Scheduler";
 import {useAppSelector} from "../app/hooks";
 import {RootState} from "../app/store";
 import {useNavigate} from "react-router-dom";

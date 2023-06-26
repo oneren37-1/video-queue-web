@@ -10,6 +10,7 @@ import Media from "./pages/Media";
 import Queues from "./pages/Queues";
 import Schedulers from "./pages/Schedulers";
 import QueuePage from "./pages/Queue";
+import Scheduler from "./pages/Scheduler";
 
 function App() {
   const authStatus = useSelector((state: RootState) => state.auth.status);
@@ -23,6 +24,7 @@ function App() {
           <Route path="/queues" element={<Queues />} />
           <Route path="/queue/:id" element={<QueuePage />} />
           <Route path="/schedulers" element={<Schedulers />} />
+          <Route path="/scheduler/:id" element={<Scheduler />} />
       </Routes>
   );
 }
