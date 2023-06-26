@@ -45,7 +45,7 @@ const MediaCard = (props: any) => {
     return (
         <Card
             border={isSelected ? "primary" : "secondary"}
-            style={{ transform: isSelected ? "scale(0.9)" : "scale(1)", transition: "all 0.2s ease-in-out"}}
+            style={{ transform: isSelected ? "scale(0.95)" : "scale(1)", transition: "all 0.2s ease-in-out"}}
             onClick={() => handleClick(id)}
         >
             <Card.Img variant="top" src={img ? " data:image/jpeg;charset=utf-8;base64," + img  : "https://www.ballipolimer.com/wp-content/uploads/2020/08/img-placeholder.png"} />
