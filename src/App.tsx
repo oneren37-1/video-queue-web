@@ -9,6 +9,7 @@ import {Route, Router, Routes} from "react-router-dom";
 import Media from "./pages/Media";
 import Queues from "./pages/Queues";
 import Schedulers from "./pages/Schedulers";
+import QueuePage from "./pages/Queue";
 
 function App() {
   const authStatus = useSelector((state: RootState) => state.auth.status);
@@ -20,6 +21,7 @@ function App() {
           <Route path="/auth" element={<Auth />} />
           <Route path="/media" element={<Media />} />
           <Route path="/queues" element={<Queues />} />
+          <Route path="/queue/:id" element={<QueuePage />} />
           <Route path="/schedulers" element={<Schedulers />} />
       </Routes>
   );

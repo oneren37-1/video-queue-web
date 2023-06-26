@@ -13,7 +13,7 @@ const Header = () => {
 
     return (
         <Navbar bg="light" expand={false} className="mb-3">
-            <Container fluid>
+            <Container>
                 <Stack direction="horizontal" gap={2}>
                     <Navbar.Brand href="/">{hostId}</Navbar.Brand>
                     <NavLink to={"/media"}>Медиа</NavLink>
