@@ -3,42 +3,34 @@ import {useParams} from "react-router-dom";
 import PageLayout from "./PageLayout";
 import {Button, Card, Container, Stack, Image, Col, Row, ListGroup} from "react-bootstrap";
 import AddMediaModal from "../components/AddMediaModal";
+import {useAppDispatch, useAppSelector} from "../app/hooks";
+import {loadQueue} from "../store/queue";
 
 const QueuePage = () => {
     const { id } = useParams();
     const [modalShow, setModalShow] = React.useState(false);
 
-    const mediaList = [
-        {
-            id: "1",
-            name: "Media 1",
-            img: "https://w.forfun.com/fetch/d6/d620a394f14eddac2b92d7d9b9da72d2.jpeg",
-            priority: 1
-        },
-        {
-            id: "2",
-            name: "Media 2",
-            img: "https://w.forfun.com/fetch/52/5209a3872dced549c0e9a6f8360c5471.jpeg",
-            priority: 2
-        },
-        {
-            id: "2",
-            name: "Media 3",
-            img: "https://w.forfun.com/fetch/56/5656d35727009cabea6ce79973a9702c.jpeg",
-            priority: 3
-        }
-    ]
+    const dispatch = useAppDispatch();
+    React.useEffect(() => {
+        dispatch(loadQueue(`${id}`))
+    }, [])
+
+    const name = useAppSelector((state) => state.queue.name)
+    const mediaList = useAppSelector((state) => state.queue.items);
 
     return (
         <PageLayout>
-            <h1>Queue</h1>
+            <h1>{name}</h1>
             <Button
                 variant={"primary"}
                 onClick={() => setModalShow(true)}
             >Добавить медиа в очередь</Button>
             <Card className={"mt-3 p-3"}>
                 <ListGroup variant="flush">
-                {mediaList && mediaList.map((m, i) => (
+                {(!mediaList || mediaList.length === 0) && <ListGroup.Item>Очередь пуста</ListGroup.Item>}
+                {mediaList && mediaList
+                    .map(m => m.media)
+                    .map((m, i) => (
                     <ListGroup.Item>
                         <Row className={"mb-1"} key={i}>
                             <Col xs={1} style={{
@@ -64,7 +56,7 @@ const QueuePage = () => {
                             </Col>
 
                             <Col className={"d-flex"}>
-                                <Image src={m.img} rounded style={{width: "150px", marginRight: "15px"}}/>
+                                <Image src={m.img ? " data:image/jpeg;charset=utf-8;base64," + m.img  : "https://www.ballipolimer.com/wp-content/uploads/2020/08/img-placeholder.png"} rounded style={{width: "150px", marginRight: "15px"}}/>
                                 {m.name.length <= 20 && <Card.Title>{m.name}</Card.Title>}
                                 {m.name.length > 20 && <Card.Text>{m.name}</Card.Text>}
                             </Col>

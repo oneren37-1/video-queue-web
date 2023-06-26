@@ -2,6 +2,7 @@ import { configureStore, ThunkAction, Action } from '@reduxjs/toolkit';
 import auth from "../store/auth";
 import displays from "../store/displays";
 import media from "../store/media";
+import queue from '../store/queue';
 import queues from "../store/queues";
 
 export const store = configureStore({
@@ -10,6 +11,7 @@ export const store = configureStore({
     displays,
     media,
     queues,
+    queue
   },
 });
 
