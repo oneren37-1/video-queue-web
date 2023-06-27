@@ -1,7 +1,7 @@
 import React from 'react';
 import {Button, ButtonGroup, Card, Modal, Stack, ToggleButton} from "react-bootstrap";
-import CronHumanize from "../../utils/cronHumanize";
-import EditScheduledQueueModal from "./EditScheduledQueueModal";
+import CronHumanize from "../utils/cronHumanize";
+import EditScheduledQueueModal from "./modals/EditScheduledQueueModal";
 
 const ScheduledQueueCard = (props: any) => {
     const {id, name, cron, duration, date} = props;

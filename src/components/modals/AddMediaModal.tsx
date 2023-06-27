@@ -1,7 +1,7 @@
 import React from 'react';
 import {Button, Col, Form, Modal, Row} from "react-bootstrap";
-import CronControl from "./cron/CronControl";
-import MediaList from "./MediaList";
+import CronControl from "../cron/CronControl";
+import MediaList from "../MediaList";
 
 const AddMediaModal = (props: any) => {
     return (

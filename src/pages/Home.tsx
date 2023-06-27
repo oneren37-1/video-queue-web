@@ -1,13 +1,13 @@
 import React, {useState} from "react";
 import {Col, Container, Nav, Navbar, Row} from "react-bootstrap";
-import Header from "../components/header/Header";
+import Header from "../components/Header";
 import {useMediaQuery} from "react-responsive";
-import DisplaysList from "../components/displaysList/DisplaysList";
+import DisplaysList from "../components/DisplaysList";
 import Scheduler from "./Scheduler";
 import {useAppSelector} from "../app/hooks";
 import {RootState} from "../app/store";
 import {useNavigate} from "react-router-dom";
-import Display from "../components/display/Display";
+import Display from "../components/Display";
 import PageLayout from "./PageLayout";
 
 const Home = () => {

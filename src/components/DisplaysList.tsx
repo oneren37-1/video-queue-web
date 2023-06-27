@@ -1,6 +1,6 @@
 import React from 'react';
-import {Display, loadDisplays} from "../../store/displays";
-import {useAppDispatch, useAppSelector} from "../../app/hooks";
+import {Display, loadDisplays} from "../store/displays";
+import {useAppDispatch, useAppSelector} from "../app/hooks";
 import {Card, ListGroup} from "react-bootstrap";
 
 const DisplaysList = () => {

@@ -2,7 +2,7 @@ import React from 'react';
 import {useParams} from "react-router-dom";
 import PageLayout from "./PageLayout";
 import {Button, Card, Container, Stack, Image, Col, Row, ListGroup} from "react-bootstrap";
-import AddMediaModal from "../components/AddMediaModal";
+import AddMediaModal from "../components/modals/AddMediaModal";
 import {useAppDispatch, useAppSelector} from "../app/hooks";
 import {loadQueue} from "../store/queue";
 

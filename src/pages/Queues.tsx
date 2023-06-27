@@ -2,7 +2,7 @@ import React from 'react';
 import PageLayout from "./PageLayout";
 import QueuesList from "../components/QueuesList";
 import {Button} from "react-bootstrap";
-import AddQueueModal from "../components/AddQueueModal";
+import AddQueueModal from "../components/modals/AddQueueModal";
 
 const Queues = () => {
     const [modalShow, setModalShow] = React.useState(false);

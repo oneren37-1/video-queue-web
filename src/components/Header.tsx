@@ -1,9 +1,9 @@
 import React from 'react';
 import {Button, Container, Form, Nav, Navbar, NavDropdown, Offcanvas, Stack} from "react-bootstrap";
-import {useAppDispatch, useAppSelector} from "../../app/hooks";
+import {useAppDispatch, useAppSelector} from "../app/hooks";
 import { useMediaQuery } from 'react-responsive'
-import DisplaysList from "../displaysList/DisplaysList";
-import {logout} from "../../store/auth";
+import DisplaysList from "./DisplaysList";
+import {logout} from "../store/auth";
 import {NavLink} from "react-router-dom";
 
 const Header = () => {

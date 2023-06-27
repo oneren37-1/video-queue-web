@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import {Button, Card, Col, Form, InputGroup, Modal, Row} from "react-bootstrap";
-import MediaList from "./MediaList";
+import MediaList from "../MediaList";
 
 const AddQueueModal = (props: any) => {
     return (

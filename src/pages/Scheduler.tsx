@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import {Button, Card, Col, Form} from 'react-bootstrap';
-import ScheduledQueueCard from "../components/queue/ScheduledQueueCard";
+import ScheduledQueueCard from "../components/ScheduledQueueCard";
 import {Cron} from "react-js-cron";
 import CronHumanize from "../utils/cronHumanize";
 import PageLayout from "./PageLayout";
