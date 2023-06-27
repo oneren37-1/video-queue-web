@@ -1,8 +1,36 @@
 import React, {useState} from 'react';
 import {Button, Card, Col, Form, InputGroup, Modal, Row} from "react-bootstrap";
 import MediaList from "../MediaList";
+import {useAppDispatch, useAppSelector} from "../../app/hooks";
+import {useNavigate} from "react-router-dom";
+import {RootState} from "../../app/store";
+import {SubmitHandler, useForm} from "react-hook-form";
+import {addQueue, IAddQueueProps} from "../../store/queues";
+
+type Inputs = {
+    name: string
+}
 
 const AddQueueModal = (props: any) => {
+    const dispatch = useAppDispatch();
+    const authStatus = useAppSelector((state: RootState) => state.auth.status);
+
+    const [mediaIds, setMediaIds] = useState<string[]>([])
+
+    const {
+        register,
+        handleSubmit,
+        watch,
+        formState: { errors },
+    } = useForm<Inputs>()
+
+    const onSubmit: SubmitHandler<Inputs> = (data) => {
+        dispatch(addQueue({
+            name: data.name,
+            mediaIds: mediaIds
+        }))
+    }
+
     return (
         <Modal
             {...props}
@@ -16,12 +44,12 @@ const AddQueueModal = (props: any) => {
                 </Modal.Title>
             </Modal.Header>
             <Modal.Body>
-                <Form>
+                <Form onSubmit={handleSubmit(onSubmit)}>
                     <InputGroup className="mb-3">
                         <InputGroup.Text id="inputGroup-sizing-default">
                             Имя
                         </InputGroup.Text>
-                        <Form.Control />
+                        <Form.Control {...register("name", { required: true })}/>
                     </InputGroup>
 
                     <Card
@@ -33,7 +61,13 @@ const AddQueueModal = (props: any) => {
                             overflowX: "hidden"
                         }}
                     >
-                        <MediaList ToggleMediaPick={() => {}}/>
+                        <MediaList ToggleMediaPick={(id: string) => {
+                            if (mediaIds.includes(id)) {
+                                setMediaIds(mediaIds.filter((mediaId) => mediaId !== id))
+                            } else {
+                                setMediaIds([...mediaIds, id])
+                            }
+                        }}/>
                     </Card>
 
                     <Form.Group className="mb-3" controlId="formBasicEmail" >

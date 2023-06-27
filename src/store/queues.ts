@@ -9,11 +9,13 @@ export type Queue = {
 export interface QueuesState {
     queues: Queue[];
     status: 'idle' | 'loading' | 'ok' | 'failed';
+    postStatus: 'idle' | 'loading' | 'ok' | 'failed';
 }
 
 const initialState: QueuesState = {
     queues: [],
-    status: 'idle'
+    status: 'idle',
+    postStatus: 'idle'
 }
 
 export const queuesSlice = createSlice({
@@ -34,6 +36,18 @@ export const queuesSlice = createSlice({
                 console.log("loadQueues.rejected");
                 console.log(action.payload)
             })
+            .addCase(addQueue.pending, (state) => {
+                state.postStatus = 'loading';
+            })
+            .addCase(addQueue.fulfilled, (state, action) => {
+                state.postStatus = 'ok';
+                state.queues.push(action.payload);
+            })
+            .addCase(addQueue.rejected, (state, action) => {
+                state.postStatus = 'failed';
+                console.log("addQueue.rejected");
+                console.log(action.payload)
+            })
     }
 })
 
@@ -44,6 +58,31 @@ export const loadQueues = createAsyncThunk(
             type: "get",
             entity: "queue",
             id: "*"
+        })
+    }
+)
+
+export interface IAddQueueProps {
+    name: string;
+    mediaIds: string[];
+}
+
+export const addQueue = createAsyncThunk(
+    'queues/add',
+    async (data: IAddQueueProps): Promise<any> => {
+        return useWSAuthedRequest({
+            type: "post",
+            entity: "queue",
+            payload: JSON.stringify({
+                name: data.name,
+                mediaIds: data.mediaIds
+            })
+        }).then((res: any) => {
+            const id = res.payload;
+            return {
+                id: id,
+                name: data.name
+            }
         })
     }
 )
