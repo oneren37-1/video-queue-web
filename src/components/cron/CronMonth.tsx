@@ -61,7 +61,6 @@ const CronMonth = (props: ICronProps) => {
                 {activeTab == "specific" && <PickGrid
                     onChange={(values: string[]) => {
                         setSpecificValues(values);
-                        console.log(values)
                         setState(values.map(v => {
                             const index = months.indexOf(v);
                             return monthsAlias[index];

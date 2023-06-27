@@ -46,7 +46,7 @@ const Scheduler = () => {
             </Col>
             <h3 className="mt-5">Запланированные очереди</h3>
             <div className={"mb-3"}><span>Очереди расположены в соответсвие с приоритетом. В случае, если на одно время запланировано несколько очередей, будет воспроизведена очередь с большим приоритетом</span></div>
-            <Button>Запланировать</Button>
+            <Button className={"mb-2"}>Запланировать</Button>
             {queues.map((queue: any) => (
                 <div className="mb-3"><ScheduledQueueCard {...queue}/></div>
             ))}
