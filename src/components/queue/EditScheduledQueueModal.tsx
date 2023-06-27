@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import {Button, Col, Form, Modal, Row} from 'react-bootstrap';
 import {SubmitHandler, useForm} from "react-hook-form";
 import { Cron } from 'react-js-cron'
-import CronControl from "./CronControl";
+import CronControl from "../cron/CronControl";
 // import 'react-cron-generator/dist/cron-builder.css'
 
 

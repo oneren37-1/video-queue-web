@@ -77,7 +77,7 @@ export const CONSTANTS: CronConstants = {
     TYPE_LAST_WEEKDAY_SPECIFIC: 'last_weekday_specific',
 
     SHORT_DAYS: ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'],
-    FULL_DAYS: ['воскревенье', 'понедельник', 'вторник', 'стреда', 'четверг', 'пятница', 'суббота'],
+    FULL_DAYS: ['воскревенье', 'понедельник', 'вторник', 'среда', 'четверг', 'пятница', 'суббота'],
     SHORT_MONTHS: ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'],
     FULL_MONTHS: ['январь', 'февраль', 'март', 'апрель', 'май', 'июнь', 'июль', 'август', 'сентябрь', 'октябрь', 'ноябрь', 'декабрь'],
 };
@@ -367,7 +367,7 @@ class CronParser {
         let cron: CronExpression = new CronExpression(expression),
             order: string[] = ['month', 'dayOfWeek', 'year'];
 
-        let result = `Запланировано на ${this.getTimeString(cron.seconds, cron.minutes, cron.hours)}`,
+        let result = `${this.getTimeString(cron.seconds, cron.minutes, cron.hours)}`,
             dayOfMonth = this.getDayOfMonthString(cron.dayOfMonth);
 
         if (dayOfMonth.length > 0) {
@@ -406,31 +406,10 @@ class CronParser {
     public getTimeString(seconds: UnitDefinition, minutes: UnitDefinition, hours: UnitDefinition): string {
         if (seconds.type === CONSTANTS.TYPE_SINGLE && minutes.type === CONSTANTS.TYPE_SINGLE && hours.type === CONSTANTS.TYPE_SINGLE) {
             return `${this.padZero(hours.single)}:${this.padZero(minutes.single)}${seconds.single === 0 ? '' : ':' + this.padZero(seconds.single)}`;
-        } else if (seconds.type === CONSTANTS.TYPE_WILDCARD && minutes.type === CONSTANTS.TYPE_WILDCARD && hours.type === CONSTANTS.TYPE_WILDCARD) {
-            return 'каждую секунду';
         } else if (seconds.type === CONSTANTS.TYPE_INTERVAL && minutes.type === CONSTANTS.TYPE_WILDCARD) {
-            return `${this.getSecondsString(seconds)}, ${this.getHoursString(hours)}`
+            return `${this.getHoursString(hours)}`
         } else {
-            return `${this.getSecondsString(seconds)}, ${this.getMinutesString(minutes)}, ${this.getHoursString(hours)}`;
-        }
-    }
-
-    public getSecondsString(seconds: UnitDefinition): string {
-        switch(seconds.type) {
-            case CONSTANTS.TYPE_WILDCARD:
-                return 'каждую секунду';
-            case CONSTANTS.TYPE_UNSPECIFIED:
-                return '';
-            case CONSTANTS.TYPE_RANGE:
-                return `каждую секунду с ${seconds.range.start} по ${seconds.range.end}`;
-            case CONSTANTS.TYPE_MULTI:
-                return `в ${seconds.multi.values.join(', ')} и ${seconds.multi.last} секунд`;
-            case CONSTANTS.TYPE_INTERVAL:
-                let isOne = seconds.interval.step === 1;
-                return `каждые ${isOne ? '' : seconds.interval.step + ' '}секунд${seconds.interval.start === 0 ? '' : ' начиная с ' + seconds.interval.start}`;
-            case CONSTANTS.TYPE_SINGLE:
-            default:
-                return `в ${seconds.single} секунду`;
+            return `${this.getHoursString(hours)}, ${this.getMinutesString(minutes)}`;
         }
     }
 
@@ -443,7 +422,7 @@ class CronParser {
             case CONSTANTS.TYPE_RANGE:
                 return `каждую минуту с ${minutes.range.start} по ${minutes.range.end}`;
             case CONSTANTS.TYPE_MULTI:
-                return `в определенные минуты ${minutes.multi.values.join(', ')} и ${minutes.multi.last}`;
+                return `в (${minutes.multi.values.join(', ')} и ${minutes.multi.last}) минут`;
             case CONSTANTS.TYPE_INTERVAL:
                 let isOne = minutes.interval.step === 1;
                 return `каждую ${isOne ? '' : minutes.interval.step + this.getOrdinal(minutes.interval.step) + ' '}минуту${minutes.interval.start === 0 ? '' : ' начиная с ' + minutes.interval.start} минуты`;
@@ -464,7 +443,7 @@ class CronParser {
                 return `в часы -  ${hours.multi.values.map(this.pad).join(', ')} и ${this.pad(hours.multi.last)}`;
             case CONSTANTS.TYPE_INTERVAL:
                 let isOne = hours.interval.step === 1;
-                return `past every ${isOne ? '' : hours.interval.step + this.getOrdinal(hours.interval.step) + ' '}hour starting at ${this.pad(hours.interval.start)}`;
+                return `каждый ${isOne ? '' : hours.interval.step} час начиная с ${this.pad(hours.interval.start)}`;
             case CONSTANTS.TYPE_SINGLE:
             default:
                 return `в ${this.pad(hours.single)} часов`;
@@ -510,19 +489,19 @@ class CronParser {
             case CONSTANTS.TYPE_RANGE:
                 return `с ${dayOfMonth.range.start + this.getOrdinal(dayOfMonth.range.start)} по ${dayOfMonth.range.end + this.getOrdinal(dayOfMonth.range.end)}`;
             case CONSTANTS.TYPE_MULTI:
-                return `в течение ${dayOfMonth.multi.values.map(this.getOrdinal).join(', ')} и ${dayOfMonth.multi.last}`;
+                return `в течение ${dayOfMonth.multi.values.join(', ')} и ${dayOfMonth.multi.last}`;
             case CONSTANTS.TYPE_INTERVAL:
                 let isOne = dayOfMonth.interval.step === 1;
-                return `every ${isOne ? '' : dayOfMonth.interval.step + ' '}day${isOne ? '' : 's'} starting on the ${dayOfMonth.interval.start + this.getOrdinal(dayOfMonth.interval.start)}`;
+                return `каждый  ${isOne ? '' : dayOfMonth.interval.step + ' '}день начиная с ${dayOfMonth.interval.start}`;
             case CONSTANTS.TYPE_NEAREST_WEEKDAY:
-                return `в будний день, ближайший к ${dayOfMonth.nearestWeekday.day}-му дню месяца`;
+                return `в рабочий день, ближайший к ${dayOfMonth.nearestWeekday.day}-му дню месяца`;
             case CONSTANTS.TYPE_LAST_WEEKDAY_MONTH:
-                return `в последний будний день месяца`;
+                return `в последний рабочий день`;
             case CONSTANTS.TYPE_LAST_DAY:
-                return `в послдений день месяца`;
+                return `в последний день`;
             case CONSTANTS.TYPE_SINGLE:
             default:
-                return `в ${dayOfMonth.single + this.getOrdinal(dayOfMonth.single)} день месяца`
+                return `${dayOfMonth.single} числа`
         }
     }
 
@@ -565,7 +544,7 @@ class CronParser {
     }
 
     public getMonthName(month: number): string {
-        return CONSTANTS.FULL_MONTHS[month];
+        return CONSTANTS.FULL_MONTHS[month-1];
     }
 
     public getDayOfWeekString(days: UnitDefinition): string {
@@ -582,14 +561,16 @@ class CronParser {
                 let isOne = days.interval.step === 1;
                 return `каждый ${isOne ? '' : days.interval.step + ' '}день${isOne ? '' : 's'} начиная с ${this.getDayOfWeekName(days.interval.start)}`;
             case CONSTANTS.TYPE_SPECIFIC:
-                return `в ${days.specific.week + this.getOrdinal(days.specific.week)} ${this.getDayOfWeekName(days.specific.day)} день месяца`;
+                return `в ${days.specific.week} ${this.getDayOfWeekName(days.specific.day)} месяца`;
             case CONSTANTS.TYPE_LAST_WEEKDAY_SPECIFIC:
                 return `с последний ${this.getDayOfWeekName(days.lastWeekdaySpecific.day)} месяца`;
             case CONSTANTS.TYPE_LAST_DAY:
                 return `с подледнее воскресенье месяца`;
             case CONSTANTS.TYPE_SINGLE:
             default:
-                return `по ${this.getDayOfWeekName(days.single)}ам`;
+                const day = this.getDayOfWeekName(days.single);
+                if (!day) return '---';
+                return `по ${day}${day[day.length-1] == 'a' ? 'м' : 'ам'}`;
         }
     }
 
