@@ -5,6 +5,7 @@ import {Button, Card, Container, Stack, Image, Col, Row, ListGroup} from "react-
 import AddMediaModal from "../components/modals/AddMediaModal";
 import {useAppDispatch, useAppSelector} from "../app/hooks";
 import {loadQueue} from "../store/queue";
+import {moveMediaDown, moveMediaUp} from '../store/queue';
 
 const QueuePage = () => {
     const { id } = useParams();
@@ -14,6 +15,8 @@ const QueuePage = () => {
     React.useEffect(() => {
         dispatch(loadQueue(`${id}`))
     }, [])
+
+    const updateStatus = useAppSelector((state) => state.queue.updateStatus);
 
     const name = useAppSelector((state) => state.queue.name)
     const mediaList = useAppSelector((state) => state.queue.items);
@@ -39,20 +42,32 @@ const QueuePage = () => {
                                 alignItems: "center",
                                 flexDirection: "column"
                             }}>
-                                <Button size={"sm"} variant={"light"}>
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                                         className="bi bi-chevron-up" viewBox="0 0 16 16">
-                                        <path fill-rule="evenodd"
-                                              d="M7.646 4.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 5.707l-5.646 5.647a.5.5 0 0 1-.708-.708l6-6z"/>
-                                    </svg>
-                                </Button>
-                                <Button size={"sm"} variant={"light"}>
+                                {i !== 0 && (
+                                    <Button
+                                        disabled={updateStatus === "loading"}
+                                        onClick={() => dispatch(moveMediaUp({queueId: id||"", mediaId: m.id}))}
+                                        size={"sm"}
+                                        variant={"light"}>
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                                             className="bi bi-chevron-down" viewBox="0 0 16 16">
+                                             className="bi bi-chevron-up" viewBox="0 0 16 16">
                                             <path fill-rule="evenodd"
-                                                  d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/>
+                                                  d="M7.646 4.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 5.707l-5.646 5.647a.5.5 0 0 1-.708-.708l6-6z"/>
                                         </svg>
                                     </Button>
+                                )}
+                                {i !== mediaList.length-1 && (
+                                    <Button
+                                        disabled={updateStatus === "loading"}
+                                        onClick={() => dispatch(moveMediaDown({queueId: id||"", mediaId: m.id}))}
+                                        size={"sm"}
+                                        variant={"light"}>
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                                 className="bi bi-chevron-down" viewBox="0 0 16 16">
+                                                <path fill-rule="evenodd"
+                                                      d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/>
+                                            </svg>
+                                        </Button>
+                                )}
                             </Col>
 
                             <Col className={"d-flex"}>

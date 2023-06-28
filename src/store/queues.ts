@@ -10,12 +10,16 @@ export interface QueuesState {
     queues: Queue[];
     status: 'idle' | 'loading' | 'ok' | 'failed';
     postStatus: 'idle' | 'loading' | 'ok' | 'failed';
+    updateStatus: 'idle' | 'loading' | 'ok' | 'failed';
+    deleteStatus: 'idle' | 'loading' | 'ok' | 'failed';
 }
 
 const initialState: QueuesState = {
     queues: [],
     status: 'idle',
-    postStatus: 'idle'
+    postStatus: 'idle',
+    updateStatus: 'idle',
+    deleteStatus: 'idle'
 }
 
 export const queuesSlice = createSlice({

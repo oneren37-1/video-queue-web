@@ -11,13 +11,15 @@ export interface QueuesState {
         priority: number,
     }[];
     status: 'idle' | 'loading' | 'ok' | 'failed';
+    updateStatus: 'idle' | 'loading' | 'ok' | 'failed';
 }
 
 const initialState: QueuesState = {
     id: "",
     name: "",
     items: [],
-    status: 'idle'
+    status: 'idle',
+    updateStatus: 'idle',
 }
 
 export const queueSlice = createSlice({
@@ -41,6 +43,58 @@ export const queueSlice = createSlice({
                 console.log("loadQueues.rejected");
                 console.log(action.payload)
             })
+
+            .addCase(moveMediaUp.pending, (state) => {
+                state.updateStatus = 'loading';
+            })
+            .addCase(moveMediaUp.fulfilled, (state, action) => {
+                state.updateStatus = 'ok';
+                const mediaId = action.payload;
+                let items = [...state.items];
+                const item = items.find(item => item.media.id === mediaId);
+                if (!item) return;
+                const itemPriority = item.priority;
+                items = items.map(el => {
+                    // @ts-ignore
+                    if (el.priority === itemPriority-1) el.priority += 1;
+                    // @ts-ignore
+                    else if (el.priority === itemPriority) el.priority -= 1;
+                    return el;
+                }).sort((a, b) => a.priority - b.priority);
+                state.items = items;
+            })
+            .addCase(moveMediaUp.rejected, (state, action) => {
+                state.updateStatus = 'failed';
+                console.log("upMedia.rejected");
+                console.log(action.payload)
+            })
+
+            .addCase(moveMediaDown.pending, (state) => {
+                state.updateStatus = 'loading';
+            })
+            .addCase(moveMediaDown.fulfilled, (state, action) => {
+                state.updateStatus = 'ok';
+                const mediaId = action.payload;
+                let items = [...state.items];
+                const item = items.find(item => item.media.id === mediaId);
+                if (!item) return;
+                const itemPriority = item.priority;
+                items = items.map(el => {
+                    // @ts-ignore
+                    if (el.priority === itemPriority+1) el.priority -= 1;
+                    // @ts-ignore
+                    else if (el.priority === itemPriority) el.priority += 1;
+                    return el;
+                }).sort((a, b) => a.priority - b.priority);
+                state.items = items;
+
+            })
+            .addCase(moveMediaDown.rejected, (state, action) => {
+                state.updateStatus = 'failed';
+                console.log("downMedia.rejected");
+                console.log(action.payload)
+            })
+
     }
 })
 
@@ -65,5 +119,39 @@ export const loadQueue = createAsyncThunk(
             })
     }
 )
+
+export const moveMediaUp = createAsyncThunk(
+    'queue/upMedia',
+    async (data: {queueId: string, mediaId: string}): Promise<any> => {
+        return useWSAuthedRequest({
+            type: "update",
+            entity: "queue",
+            id: data.queueId,
+            payload: JSON.stringify({
+                action: "up",
+                mediaId: data.mediaId
+            })
+        }).then((res: any) => {
+            if (res.payload === "error") throw new Error("Error");
+            return data.mediaId;
+        })
+    })
+
+export const moveMediaDown = createAsyncThunk(
+    'queue/downMedia',
+    async (data: {queueId: string, mediaId: string}): Promise<any> => {
+        return useWSAuthedRequest({
+            type: "update",
+            entity: "queue",
+            id: data.queueId,
+            payload: JSON.stringify({
+                action: "down",
+                mediaId: data.mediaId
+            })
+        }).then((res: any) => {
+            if (res.payload === "error") throw new Error("Error");
+            return data.mediaId;
+        })
+    })
 
 export default queueSlice.reducer;
