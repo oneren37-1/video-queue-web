@@ -95,8 +95,37 @@ export const queueSlice = createSlice({
                 console.log(action.payload)
             })
 
+            .addCase(renameQueue.pending, (state) => {
+                state.updateStatus = 'loading';
+            })
+            .addCase(renameQueue.fulfilled, (state, action) => {
+                state.updateStatus = 'ok';
+                state.name = action.payload;
+            })
+            .addCase(renameQueue.rejected, (state, action) => {
+                state.updateStatus = 'failed';
+                console.log("renameQueue.rejected");
+                console.log(action.payload)
+            })
     }
 })
+
+export const renameQueue = createAsyncThunk(
+    'queue/rename',
+    async (data: {id: string, name: string}): Promise<any> => {
+        return useWSAuthedRequest({
+            type: "update",
+            entity: "queue",
+            id: data.id,
+            payload: JSON.stringify({
+                action: "rename",
+                name: data.name
+            })
+        }).then((res: any) => {
+            if (res.payload === "error") throw new Error("Error");
+            return data.name;
+        })
+    });
 
 export const loadQueue = createAsyncThunk(
     'queue/load',
