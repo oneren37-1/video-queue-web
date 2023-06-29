@@ -21,7 +21,7 @@ const QueuesList = () => {
                     <span className="visually-hidden">Loading...</span>
                 </Spinner>
             )}
-            {queues.map((q, i) => (
+            {loadingStatus == "ok" && queues.map((q, i) => (
                 <NavLink key={i} to={`/queue/${q.id}`}>
                     <Card className={"mb-2"}>
                         <Card.Body>

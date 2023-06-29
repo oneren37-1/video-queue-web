@@ -12,6 +12,7 @@ export interface QueuesState {
     }[];
     status: 'idle' | 'loading' | 'ok' | 'failed';
     updateStatus: 'idle' | 'loading' | 'ok' | 'failed';
+    deleteStatus: 'idle' | 'loading' | 'ok' | 'failed';
 }
 
 const initialState: QueuesState = {
@@ -20,6 +21,7 @@ const initialState: QueuesState = {
     items: [],
     status: 'idle',
     updateStatus: 'idle',
+    deleteStatus: 'idle',
 }
 
 export const queueSlice = createSlice({
@@ -143,8 +145,32 @@ export const queueSlice = createSlice({
                 console.log(action.payload)
             })
 
+            .addCase(deleteQueue.pending, (state) => {
+                state.updateStatus = 'loading';
+            })
+            .addCase(deleteQueue.fulfilled, (state, action) => {
+                state = initialState;
+            })
+            .addCase(deleteQueue.rejected, (state, action) => {
+                state.updateStatus = 'failed';
+                console.log("deleteQueue.rejected");
+                console.log(action.payload)
+            })
     }
 })
+
+export const deleteQueue = createAsyncThunk(
+    'queue/deleteQueue',
+    async (queueId: string): Promise<any> => {
+        return useWSAuthedRequest({
+            type: "delete",
+            entity: "queue",
+            id: queueId,
+        }).then((res: any) => {
+            if (res.payload === "error") throw new Error("Error");
+            return queueId;
+        })
+    })
 
 export const removeMedia = createAsyncThunk(
     'queue/removeMedia',
