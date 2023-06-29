@@ -128,8 +128,40 @@ export const queueSlice = createSlice({
                 console.log("addMediaToQueue.rejected");
                 console.log(action.payload)
             })
+
+            .addCase(removeMedia.pending, (state) => {
+                state.updateStatus = 'loading';
+            })
+            .addCase(removeMedia.fulfilled, (state, action) => {
+                state.updateStatus = 'ok';
+                const mediaId = action.payload;
+                state.items = state.items.filter(item => item.media.id !== mediaId);
+            })
+            .addCase(removeMedia.rejected, (state, action) => {
+                state.updateStatus = 'failed';
+                console.log("removeMedia.rejected");
+                console.log(action.payload)
+            })
+
     }
 })
+
+export const removeMedia = createAsyncThunk(
+    'queue/removeMedia',
+    async (data: {queueId: string, mediaId: string}): Promise<any> => {
+        return useWSAuthedRequest({
+            type: "update",
+            entity: "queue",
+            id: data.queueId,
+            payload: JSON.stringify({
+                action: "removeMedia",
+                mediaId: data.mediaId
+            })
+        }).then((res: any) => {
+            if (res.payload === "error") throw new Error("Error");
+            return data.mediaId;
+        })
+    })
 
 export const addMediaToQueue = createAsyncThunk(
     'queue/addMedia',
