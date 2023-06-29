@@ -4,6 +4,8 @@ import displays from "../store/displays";
 import media from "../store/media";
 import queue from '../store/queue';
 import queues from "../store/queues";
+import scheduler from '../store/scheduler';
+import schedulers from "../store/schedulers";
 
 export const store = configureStore({
   reducer: {
@@ -11,7 +13,9 @@ export const store = configureStore({
     displays,
     media,
     queues,
-    queue
+    queue,
+    schedulers,
+    scheduler
   },
 });
 

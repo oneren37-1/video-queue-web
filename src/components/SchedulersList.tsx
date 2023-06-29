@@ -1,40 +1,28 @@
 import React from 'react';
 import {loadMedia, Media} from "../store/media";
 import {useAppDispatch, useAppSelector} from "../app/hooks";
-import {Card, Col, Row} from "react-bootstrap";
+import {Card, Col, Row, Spinner} from "react-bootstrap";
 import {loadQueues, Queue} from "../store/queues";
 import {NavLink} from "react-router-dom";
+import {loadSchedulers} from "../store/schedulers";
 
 const SchedulersList = () => {
-    const schedulers: Queue[] = [
-        {
-            id: "1",
-            name: "Scheduler 1"
-        },
-        {
-            id: "2",
-            name: "Scheduler 2"
-        },
-        {
-            id: "3",
-            name: "Scheduler 3"
-        }
-    ];
-    // const loadingStatus = useAppSelector((state) => state.queues.status);
+    const schedulers = useAppSelector((state) => state.schedulers.schedulers);
+    const loadingStatus = useAppSelector((state) => state.schedulers.status);
     const dispatch = useAppDispatch();
 
     React.useEffect(() => {
-        dispatch(loadQueues())
+        dispatch(loadSchedulers())
     }, [])
 
     return (
         <div>
-            {/*{loadingStatus === "loading" && (*/}
-            {/*    <Spinner animation="border" role="status">*/}
-            {/*        <span className="visually-hidden">Loading...</span>*/}
-            {/*    </Spinner>*/}
-            {/*)}*/}
-            {schedulers && schedulers.map((s, i) => (
+            {loadingStatus === "loading" && (
+                <Spinner animation="border" role="status">
+                    <span className="visually-hidden">Loading...</span>
+                </Spinner>
+            )}
+            {loadingStatus === "ok" && schedulers && schedulers.map((s, i) => (
                 <NavLink to={`/scheduler/${s.id}`}>
                     <Card className={"mb-2"}>
                         <Card.Body>

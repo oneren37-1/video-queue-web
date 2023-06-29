@@ -4,7 +4,7 @@ import CronHumanize from "../utils/cronHumanize";
 import EditScheduledQueueModal from "./modals/EditScheduledQueueModal";
 
 const ScheduledQueueCard = (props: any) => {
-    const {id, name, cron, duration, date} = props;
+    const {id, queue, cron, duration, date} = props;
     const [RemoveQueueModalShow, setRemoveQueueModalShow] = React.useState(false);
 
     const [editModalShow, setEditModalShow] = React.useState(false);
@@ -24,7 +24,7 @@ const ScheduledQueueCard = (props: any) => {
     return (
         <Card style={{ width: '40rem' }} >
             <Card.Body>
-                <Card.Title>{ name }</Card.Title>
+                <Card.Title>{ queue.name }</Card.Title>
                 {date && (
                     <Card.Text>
                         {date}
