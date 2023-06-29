@@ -107,8 +107,49 @@ export const queueSlice = createSlice({
                 console.log("renameQueue.rejected");
                 console.log(action.payload)
             })
+
+            .addCase(addMediaToQueue.pending, (state) => {
+                state.updateStatus = 'loading';
+            })
+            .addCase(addMediaToQueue.fulfilled, (state, action) => {
+                state.updateStatus = 'ok';
+                const newMedia = action.payload;
+                const currCount = state.items.length;
+                const newItems = newMedia.map((media: Media, index: number) => {
+                    return {
+                        media,
+                        priority: currCount + index
+                    }
+                });
+                state.items = [...state.items, ...newItems];
+            })
+            .addCase(addMediaToQueue.rejected, (state, action) => {
+                state.updateStatus = 'failed';
+                console.log("addMediaToQueue.rejected");
+                console.log(action.payload)
+            })
     }
 })
+
+export const addMediaToQueue = createAsyncThunk(
+    'queue/addMedia',
+    async (data: {queueId: string, mediaIds: string[]}): Promise<any> => {
+        console.log(data)
+        return useWSAuthedRequest({
+            type: "update",
+            entity: "queue",
+            id: data.queueId,
+            payload: JSON.stringify({
+                action: "add",
+                mediaId: data.mediaIds
+            })
+        }).then((res: any) => {
+            console.log(res)
+            const dataParsed = JSON.parse(res.payload);
+            if (!dataParsed.length) throw new Error("No queue found");
+            return dataParsed;
+        })
+    });
 
 export const renameQueue = createAsyncThunk(
     'queue/rename',
