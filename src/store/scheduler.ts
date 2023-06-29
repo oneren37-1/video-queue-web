@@ -15,7 +15,7 @@ export interface SchedulerState {
     id: string;
     name: string;
     queues: SchedeledQueue[];
-    defaultQueue: Queue;
+    defaultQueueId: string;
     status: 'idle' | 'loading' | 'ok' | 'failed';
     updateStatus: 'idle' | 'loading' | 'ok' | 'failed';
     deleteStatus: 'idle' | 'loading' | 'ok' | 'failed';
@@ -25,10 +25,7 @@ const initialState: SchedulerState = {
     id: '',
     name: '',
     queues: [],
-    defaultQueue: {
-        id: '',
-        name: ''
-    },
+    defaultQueueId: 'null',
     status: 'idle',
     updateStatus: 'idle',
     deleteStatus: 'idle'
@@ -48,15 +45,49 @@ export const queueSlice = createSlice({
                 const data = action.payload;
                 state.id = data.id;
                 state.name = data.name;
-                state.defaultQueue = data.defaultQueue;
+                state.defaultQueueId = data.defaultQueue;
                 state.queues = data.items;
             })
             .addCase(loadScheduler.rejected, (state, action) => {
                 state.status = 'failed';
                 console.log("loadQueues.rejected");
                 console.log(action.payload)
-            })}
+            })
+
+            .addCase(changeDefaultQueue.pending, (state) => {
+                state.updateStatus = 'loading';
+            })
+            .addCase(changeDefaultQueue.fulfilled, (state, action) => {
+                state.updateStatus = 'ok';
+                const data = action.payload;
+                state.defaultQueueId = data.id;
+            })
+            .addCase(changeDefaultQueue.rejected, (state, action) => {
+                state.updateStatus = 'failed';
+                console.log("changeDefaultQueue.rejected");
+                console.log(action.payload)
+            })
+    }
 })
+
+export const changeDefaultQueue = createAsyncThunk(
+    'scheduler/changeDefaultQueue',
+    async (data: {id: string, queueId: string}): Promise<any> => {
+        return useWSAuthedRequest({
+            type: "update",
+            entity: "scheduler",
+            id: data.id,
+            payload: JSON.stringify({
+                action: "changeDefaultQueue",
+                defaultQueue: data.queueId
+            })
+        }).then((res: any) => {
+            if (res.payload === "error") throw new Error("Error");
+            return {
+                id: data.queueId
+            };
+        })
+    })
 
 export const loadScheduler = createAsyncThunk(
     'scheduler/loadScheduler',
