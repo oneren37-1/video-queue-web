@@ -15,13 +15,13 @@ const CronDays = (props: any) => {
         else if (stateW.indexOf("#") !== -1) initialTab = "#";
         else initialTab = "specific-weekdays";
     } else {
-        if (stateM === "L") initialTab = "last";
+        if (stateM === "*") initialTab = "every";
+        else if (stateM === "L") initialTab = "last";
         else if (stateM === "LW") initialTab = "last-workday";
         else if (stateM.indexOf("/") !== -1) initialTab = "periodically";
         else if (stateM.indexOf("-") !== -1) initialTab = "interval";
         else initialTab =  "specific";
     }
-
 
     const [
         specificValues,
@@ -154,6 +154,7 @@ const CronDays = (props: any) => {
                 />
                 {activeTab == "specific" && <PickGrid
                     onChange={(values: string[]) => {
+                        setSpecificValues(values);
                         setStateM(values.join(","))
                         setStateW("?");
                     }}

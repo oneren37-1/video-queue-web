@@ -2,7 +2,7 @@ import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import {Queue} from "./queues";
 import {useWSAuthedRequest} from "../app/hooks";
 
-export type SchedeledQueue = {
+export type ScheduledQueue = {
     id: string;
     queue: Queue;
     priority: number;
@@ -14,7 +14,7 @@ export type SchedeledQueue = {
 export interface SchedulerState {
     id: string;
     name: string;
-    queues: SchedeledQueue[];
+    queues: ScheduledQueue[];
     defaultQueueId: string;
     status: 'idle' | 'loading' | 'ok' | 'failed';
     updateStatus: 'idle' | 'loading' | 'ok' | 'failed';
@@ -31,7 +31,7 @@ const initialState: SchedulerState = {
     deleteStatus: 'idle'
 }
 
-export const queueSlice = createSlice({
+export const schedulerSlice = createSlice({
     name: 'scheduler',
     initialState,
     reducers: {},
@@ -46,7 +46,13 @@ export const queueSlice = createSlice({
                 state.id = data.id;
                 state.name = data.name;
                 state.defaultQueueId = data.defaultQueue;
-                state.queues = data.items;
+                state.queues = data.items.map((e: any) => {
+                    e.duration /= 60;
+                    return e;
+                });
+                state.queues = state.queues.sort((a, b) => {
+                    return a.priority - b.priority;
+                })
             })
             .addCase(loadScheduler.rejected, (state, action) => {
                 state.status = 'failed';
@@ -67,8 +73,61 @@ export const queueSlice = createSlice({
                 console.log("changeDefaultQueue.rejected");
                 console.log(action.payload)
             })
+
+            .addCase(schedule.pending, (state) => {
+                state.updateStatus = 'loading';
+            })
+            .addCase(schedule.fulfilled, (state, action) => {
+                state.updateStatus = 'ok';
+                const data = action.payload;
+                state.queues.forEach((item, index) => {
+                    item.priority += 1;
+                })
+
+                state.queues.push(data)
+
+                state.queues = state.queues.sort((a, b) => {
+                    return a.priority - b.priority;
+                })
+            })
+            .addCase(schedule.rejected, (state, action) => {
+                state.updateStatus = 'failed';
+                console.log("schedule.rejected");
+                console.log(action.payload)
+            })
     }
 })
+
+export const schedule = createAsyncThunk(
+    'scheduler/schedule',
+    async (data: any): Promise<any> => {
+        return useWSAuthedRequest({
+            type: "update",
+            entity: "scheduler",
+            id: data.id,
+            payload: JSON.stringify({
+                action: "schedule",
+                queue: data.queueId,
+                cron: data.cron,
+                emitTime: data.date,
+                // в минутах
+                duration: data.duration
+            })
+        }).then((res: any) => {
+            if (res.payload === "error") throw new Error("Error");
+            return {
+                id: res.payload,
+                cron: data.cron,
+                emitTime: data.date,
+                duration: data.duration,
+                queue: {
+                    id: data.queueId,
+                    name: data.queueName
+                },
+                priority: 0
+            };
+        })
+    });
 
 export const changeDefaultQueue = createAsyncThunk(
     'scheduler/changeDefaultQueue',
@@ -112,4 +171,4 @@ export const loadScheduler = createAsyncThunk(
     })
 
 
-export default queueSlice.reducer;
+export default schedulerSlice.reducer;

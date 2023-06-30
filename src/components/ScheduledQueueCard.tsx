@@ -4,7 +4,7 @@ import CronHumanize from "../utils/cronHumanize";
 import EditScheduledQueueModal from "./modals/EditScheduledQueueModal";
 
 const ScheduledQueueCard = (props: any) => {
-    const {id, queue, cron, duration, date} = props;
+    const {id, queue, cron, duration, emitTime} = props;
     const [RemoveQueueModalShow, setRemoveQueueModalShow] = React.useState(false);
 
     const [editModalShow, setEditModalShow] = React.useState(false);
@@ -14,20 +14,19 @@ const ScheduledQueueCard = (props: any) => {
     }
 
     const getDurationStr = (duration: number) => {
-        const hours = Math.floor(duration/1000/60/60);
-        const minutes = Math.floor(duration/1000/60) - hours*60;
-        const seconds = Math.floor(duration/1000) - hours*60*60 - minutes*60;
+        const hours = Math.floor(duration/60);
+        const minutes = Math.floor(duration) - hours*60;
 
-        return `${hours}ч ${minutes} мин ${seconds} сек`;
+        return `${hours}ч ${minutes} мин`;
     }
 
     return (
         <Card style={{ width: '40rem' }} >
             <Card.Body>
                 <Card.Title>{ queue.name }</Card.Title>
-                {date && (
+                {emitTime && (
                     <Card.Text>
-                        {date}
+                        {new Date(emitTime).toLocaleString()}
                     </Card.Text>
                 )}
                 {cron && (

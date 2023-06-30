@@ -15,7 +15,7 @@ type Inputs = {
 
 const EditScheduledQueueModal = (props: any) => {
     const {id, name, date, time, cron, duration} = props;
-    const [value, setValue] = useState('30 5 * * 1,6')
+    const [cronInput, setCronInput] = useState('* * * * * * *')
 
     const {
         register,
@@ -59,7 +59,10 @@ const EditScheduledQueueModal = (props: any) => {
                         />
                     </Form.Group>
 
-                    {isCron && (<CronControl />)}
+                    {isCron && (<CronControl
+                        value={cronInput}
+                        onChange={setCronInput}
+                    />)}
 
                     {!isCron && (
                         <Row>

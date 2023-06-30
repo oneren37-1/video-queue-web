@@ -10,13 +10,32 @@ export interface ICronProps {
     state: string
     setState: (value: string) => void
 }
-const CronControl = () => {
+
+export interface ICronControlProps {
+    value: string,
+    onChange: (value: string) => void
+}
+
+const CronControl = (props: ICronControlProps) => {
+    const {value, onChange} = props;
+
+    const parts = value.split(" ");
+
     const [activeTab, setActiveTab] = useState<string>("hour")
-    const [minState, setMinState] = useState<string>("0")
-    const [hourState, setHourState] = useState<string>("*")
-    const [dayMState, setDayMState] = useState<string>("?")
-    const [dayWState, setDayWState] = useState<string>("*")
-    const [monthState, setMonthState] = useState<string>("*")
+    const [minState, setMinState] = useState<string>(parts[1])
+    const [hourState, setHourState] = useState<string>(parts[2])
+    const [dayMState, setDayMState] = useState<string>(parts[3])
+    const [dayWState, setDayWState] = useState<string>(parts[4])
+    const [monthState, setMonthState] = useState<string>(parts[5])
+
+    const getCronString = () => {
+        return `0 ${minState} ${hourState} ${dayMState} ${monthState} ${dayWState} *`
+    }
+
+    React.useEffect(() => {
+        onChange(getCronString())
+        console.log(getCronString())
+    }, [minState, hourState, dayMState, dayWState, monthState])
 
     return (
         <Card className={"mb-3"}>
