@@ -6,9 +6,14 @@ import DisplaysList from "../components/DisplaysList";
 import Scheduler from "./Scheduler";
 import {useAppSelector} from "../app/hooks";
 import {RootState} from "../app/store";
-import {useNavigate} from "react-router-dom";
+import {Outlet, Route, Routes, useNavigate} from "react-router-dom";
 import Display from "../components/Display";
 import PageLayout from "./PageLayout";
+import Auth from "./Auth";
+import Media from "./Media";
+import Queues from "./Queues";
+import QueuePage from "./Queue";
+import Schedulers from "./Schedulers";
 
 const Home = () => {
 
@@ -25,7 +30,7 @@ const Home = () => {
 
                 )}
                 <Col className="content" md={10}>
-                    <Display />
+                    <Outlet />
                 </Col>
             </Row>
         </PageLayout>

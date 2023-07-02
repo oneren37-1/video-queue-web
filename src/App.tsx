@@ -11,6 +11,7 @@ import Queues from "./pages/Queues";
 import Schedulers from "./pages/Schedulers";
 import QueuePage from "./pages/Queue";
 import Scheduler from "./pages/Scheduler";
+import Display from "./components/Display";
 
 function App() {
   const authStatus = useSelector((state: RootState) => state.auth.status);
@@ -18,7 +19,9 @@ function App() {
 
   return (
       <Routes>
-          <Route path="/" element={<Home />} />
+          <Route path="/" element={<Home />} >
+              <Route path=":id" element={<Display />} />
+          </Route>
           <Route path="/auth" element={<Auth />} />
           <Route path="/media" element={<Media />} />
           <Route path="/queues" element={<Queues />} />

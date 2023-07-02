@@ -2,6 +2,7 @@ import React from 'react';
 import {Display, loadDisplays} from "../store/displays";
 import {useAppDispatch, useAppSelector} from "../app/hooks";
 import {Card, ListGroup} from "react-bootstrap";
+import {NavLink} from "react-router-dom";
 
 const DisplaysList = () => {
     const displays: Display[] = useAppSelector((state) => state.displays.displays);
@@ -26,8 +27,8 @@ const DisplaysListItem = (props: Display) => {
     const {id, name} = props;
 
     return (
-        <ListGroup.Item action href="#link2">
-            { name }
+        <ListGroup.Item>
+            <NavLink to={id}>{ name }</NavLink>
         </ListGroup.Item>
     )
 }
