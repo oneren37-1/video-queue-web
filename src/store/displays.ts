@@ -7,6 +7,12 @@ export type Display = {
     id: string;
     name: string;
     schedulerId: string | null;
+    currentMedia: {
+        contentName: string;
+        contentId: string;
+        queueId: string;
+        queueName: string
+    }
 }
 export interface DisplaysState {
     displays: Display[];
@@ -22,7 +28,14 @@ export const displaysSlice = createSlice({
     name: 'displays',
     initialState,
     reducers: {
-
+        setCurrentMedia(state, action) {
+            const { displayId, contentName, contentId, queueName, queueId} = action.payload
+            const display = state.displays
+                .find(display => display.id === displayId);
+            if (display) {
+                display.currentMedia = { contentName, contentId, queueName, queueId };
+            }
+        }
     },
     extraReducers: (builder) => {
         builder
@@ -52,5 +65,5 @@ export const loadDisplays = createAsyncThunk(
     }
 )
 
-// export const { logout } = displaysSlice.actions;
+export const { setCurrentMedia } = displaysSlice.actions;
 export default displaysSlice.reducer;

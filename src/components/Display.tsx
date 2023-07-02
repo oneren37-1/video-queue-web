@@ -1,7 +1,8 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {Button, ButtonGroup} from "react-bootstrap";
 import {useParams} from "react-router-dom";
-import {useAppSelector, useWSAuthedRequest} from "../app/hooks";
+import {useAppDispatch, useAppSelector, useWebsocket, useWSAuthedRequest} from "../app/hooks";
+import {setCurrentMedia} from "../store/displays";
 
 const Display = () => {
 
@@ -29,6 +30,21 @@ const Display = () => {
             console.log(error);
         })
     }
+
+    const dispatch = useAppDispatch();
+    const currMedia = useAppSelector((state) => state.displays.displays.find(d => d.id == id)?.currentMedia);
+
+    useEffect(() => {
+        // eslint-disable-next-line react-hooks/rules-of-hooks
+        const ws = useWebsocket();
+        const handler = (e: any) => {
+            const data = JSON.parse(e.data);
+            if (data.type != "currMediaChanged") return
+            dispatch(setCurrentMedia(data))
+        }
+        ws.addEventListener("message", handler);
+        return () => { ws.removeEventListener("message", handler) }
+    }, []);
 
     return (
         <div>
@@ -110,9 +126,13 @@ const Display = () => {
                         <Button size="sm" variant="primary">Назначить планировщик</Button>
                     )}
 
-                    <h4 className="mt-3">Сейчас играет</h4>
-                    <strong>Видео с котиками</strong><br/>
-                    <span>Из очереди <a href="#">Очередь добра</a></span>
+                    {currMedia && (
+                        <>
+                            <h4 className="mt-3">Сейчас играет</h4>
+                            <strong>{currMedia.contentName}</strong><br/>
+                            <span>Из очереди <a href="#">{currMedia.queueName}</a></span>
+                        </>
+                    )}
                 </>
             )}
         </div>
