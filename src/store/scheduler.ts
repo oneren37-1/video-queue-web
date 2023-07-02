@@ -114,8 +114,37 @@ export const schedulerSlice = createSlice({
                 console.log("editSchedule.rejected");
                 console.log(action.payload)
             })
+            .addCase(dropQueue.pending, (state) => {
+                state.updateStatus = 'loading';
+            })
+            .addCase(dropQueue.fulfilled, (state, action) => {
+                state.status = 'ok';
+                state.queues = state.queues.filter(q => q.id !== action.payload.itemId);
+            })
+            .addCase(dropQueue.rejected, (state, action) => {
+                state.status = 'failed';
+                console.log("dropQueue.rejected");
+                console.log(action.payload)
+            })
     }
 })
+
+export const dropQueue = createAsyncThunk(
+    'scheduler/dropQueue',
+    async (data: any): Promise<any> => {
+        return useWSAuthedRequest({
+            type: "update",
+            entity: "scheduler",
+            id: data.id,
+            payload: JSON.stringify({
+                action: "dropQueue",
+                itemId: data.itemId
+            })
+        }).then((res: any) => {
+            if (res.payload === "error") throw new Error("Error");
+            return data;
+        })
+    });
 
 export const editSchedule = createAsyncThunk(
     'scheduler/editSchedule',
