@@ -4,7 +4,7 @@ import CronHumanize from "../utils/cronHumanize";
 import EditScheduledQueueModal from "./modals/EditScheduledQueueModal";
 
 const ScheduledQueueCard = (props: any) => {
-    const {id, queue, cron, duration, emitTime} = props;
+    const {id, queue, cron, duration, emitTime, schedulerId} = props;
     const [RemoveQueueModalShow, setRemoveQueueModalShow] = React.useState(false);
 
     const [editModalShow, setEditModalShow] = React.useState(false);

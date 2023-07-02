@@ -55,7 +55,7 @@ const Scheduler = () => {
                 onClick={() => {setModalShow(true)}}
             >Запланировать</Button>
             {queues.map((queue: any) => (
-                <div className="mb-3"><ScheduledQueueCard {...queue}/></div>
+                <div className="mb-3"><ScheduledQueueCard {...queue} schedulerId={id}/></div>
             ))}
             <ScheduleQueueModal
                 show={modalShow}

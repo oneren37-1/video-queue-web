@@ -95,8 +95,48 @@ export const schedulerSlice = createSlice({
                 console.log("schedule.rejected");
                 console.log(action.payload)
             })
+            .addCase(editSchedule.pending, (state) => {
+                state.updateStatus = 'loading';
+            })
+            .addCase(editSchedule.fulfilled, (state, action) => {
+                state.status = 'ok';
+                state.queues = state.queues.map(q => {
+                    if (q.id === action.payload.itemId) {
+                        q.cron = action.payload.cron;
+                        q.duration = action.payload.duration;
+                        q.emitTime = action.payload.date;
+                    }
+                    return q
+                })
+            })
+            .addCase(editSchedule.rejected, (state, action) => {
+                state.status = 'failed';
+                console.log("editSchedule.rejected");
+                console.log(action.payload)
+            })
     }
 })
+
+export const editSchedule = createAsyncThunk(
+    'scheduler/editSchedule',
+    async (data: any): Promise<any> => {
+        return useWSAuthedRequest({
+            type: "update",
+            entity: "scheduler",
+            id: data.id,
+            payload: JSON.stringify({
+                action: "editSchedule",
+                itemId: data.itemId,
+                cron: data.cron,
+                emitTime: data.date,
+                // в минутах
+                duration: data.duration
+            })
+        }).then((res: any) => {
+            if (res.payload === "error") throw new Error("Error");
+            return data;
+        })
+    });
 
 export const schedule = createAsyncThunk(
     'scheduler/schedule',
@@ -115,17 +155,7 @@ export const schedule = createAsyncThunk(
             })
         }).then((res: any) => {
             if (res.payload === "error") throw new Error("Error");
-            return {
-                id: res.payload,
-                cron: data.cron,
-                emitTime: data.date,
-                duration: data.duration,
-                queue: {
-                    id: data.queueId,
-                    name: data.queueName
-                },
-                priority: 0
-            };
+            return data;
         })
     });
 

@@ -20,7 +20,7 @@ type Inputs = {
 
 const ScheduleQueueModal = (props: any) => {
     const { id } = props;
-    const [ cronInput, setCronInput] = useState('* * * * * * *')
+    const [ cronInput, setCronInput] = useState('0 0 * * * ? *')
 
     const [formErrors, setFormErrors] = useState<string>("")
 
@@ -138,13 +138,13 @@ const ScheduleQueueModal = (props: any) => {
                             type={"number"}
                             style={{display: "inline", width: "60px"}}
                             className={"m-2"} size={"sm"} min={0} max={23}
-                            {...register("durationMin")}
+                            {...register("durationHours")}
                         ></Form.Control> часов
                         <Form.Control
                             type={"number"}
                             style={{display: "inline", width: "60px"}}
                             className={"m-2"} size={"sm"} min={0} max={59}
-                            {...register("durationHours")}
+                            {...register("durationMin")}
                         ></Form.Control> минут
                     </Form.Group>
 

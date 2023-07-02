@@ -1,21 +1,28 @@
 import React, {useState} from 'react';
-import {Button, Col, Form, Modal, Row} from 'react-bootstrap';
+import {Alert, Button, Col, Form, Modal, Row} from 'react-bootstrap';
 import {SubmitHandler, useForm} from "react-hook-form";
 import { Cron } from 'react-js-cron'
 import CronControl from "../cron/CronControl";
-// import 'react-cron-generator/dist/cron-builder.css'
+import {changeDefaultQueue, editSchedule, schedule} from "../../store/scheduler";
+import {Queue} from "../../store/queues";
+import {useAppDispatch, useAppSelector} from "../../app/hooks";
+import {login} from "../../store/auth";
 
 
 type Inputs = {
+    durationMin: number,
+    durationHours: number,
     isCron: boolean
-    cron: string | null,
     date: string | null,
     time: string | null,
 }
 
 const EditScheduledQueueModal = (props: any) => {
-    const {id, name, date, time, cron, duration} = props;
-    const [cronInput, setCronInput] = useState('* * * * * * *')
+    const { id, queueName, cron, duration, schedulerId } = props;
+
+    const [ cronInput, setCronInput] = useState(cron || "0 0 * * * ? *")
+
+    const [formErrors, setFormErrors] = useState<string>("")
 
     const {
         register,
@@ -25,17 +32,39 @@ const EditScheduledQueueModal = (props: any) => {
     } = useForm<Inputs>({
         defaultValues: {
             isCron: !!cron,
-            date: date,
-            cron: cron,
+            durationMin: duration -  Math.round(duration / 60) * 60,
+            durationHours: Math.round(duration / 60)
         }
     })
 
+    const dispatch = useAppDispatch();
     const isCron = watch("isCron");
-    const d = watch("date");
 
     const onSubmit: SubmitHandler<Inputs> = (data) => {
-        // dispatch(login(data))
+        setFormErrors("")
+
+        if (!isCron && (!data.date || !data.time)) {
+            setFormErrors("Необходимо указать дату и время");
+            return;
+        }
+
+        if (!(data.durationHours + data.durationMin * 60)) {
+            setFormErrors("Необходимо указать длительность очереди");
+            return;
+        }
+
+        dispatch(editSchedule({
+            id: schedulerId,
+            itemId: id,
+            duration: +data.durationHours + (data.durationMin * 60),
+            cron: data.isCron ? cronInput : null,
+            date: data.isCron ? null : data.date + " " + data.time,
+        }))
+
+        props.onHide();
     }
+
+    const queuesNames: Queue[] = useAppSelector((state) => state.queues.queues);
 
     return (
         <Modal
@@ -46,53 +75,78 @@ const EditScheduledQueueModal = (props: any) => {
         >
             <Modal.Header closeButton>
                 <Modal.Title id="contained-modal-title-vcenter">
-                     Редактирование расписания очереди "{name}"
+                    Редактирование расписания очереди {queueName}
                 </Modal.Title>
             </Modal.Header>
             <Modal.Body>
-                <Form onSubmit={handleSubmit(onSubmit)}>
-                    <Form.Group className="mb-3" controlId="formBasicEmail">
-                        <Form.Check
-                            type={"checkbox"}
-                            label={"Повторять"}
-                            {...register("isCron")}
-                        />
-                    </Form.Group>
+                {/*<Form onSubmit={(e) => {*/}
+                {/*    e.preventDefault();*/}
+                {/*    console.log("onSubmit")*/}
+                {/*}}>*/}
+                <Form.Group className="mb-3">
+                    <Form.Check
+                        type={"checkbox"}
+                        label={"Повторять"}
+                        {...register("isCron")}
+                    />
+                </Form.Group>
 
-                    {isCron && (<CronControl
-                        value={cronInput}
-                        onChange={setCronInput}
-                    />)}
+                {isCron && (<CronControl
+                    value={cronInput}
+                    onChange={(val) => setCronInput(val)}
+                />)}
 
-                    {!isCron && (
-                        <Row>
-                            <Col>
-                                <Form.Group className="mb-3" controlId="formBasicEmail">
-                                    <Form.Label>Дата</Form.Label>
-                                    <Form.Control
-                                        type={"date"}
-                                        {...register("date")}
-                                    ></Form.Control>
-                                </Form.Group>
-                            </Col>
-                            <Col>
-                                <Form.Group className="mb-3" controlId="formBasicEmail">
-                                    <Form.Label>Время</Form.Label>
-                                    <Form.Control
-                                        type={"time"}
-                                        {...register("time")}
-                                    ></Form.Control>
-                                </Form.Group>
-                            </Col>
-                        </Row>
-                    )}
+                {!isCron && (
+                    <Row>
+                        <Col>
+                            <Form.Group className="mb-3" controlId="formBasicEmail">
+                                <Form.Label>Дата</Form.Label>
+                                <Form.Control
+                                    type={"date"}
+                                    {...register("date")}
+                                ></Form.Control>
+                            </Form.Group>
+                        </Col>
+                        <Col>
+                            <Form.Group className="mb-3" controlId="formBasicEmail">
+                                <Form.Label>Время</Form.Label>
+                                <Form.Control
+                                    type={"time"}
+                                    {...register("time")}
+                                ></Form.Control>
+                            </Form.Group>
+                        </Col>
+                    </Row>
+                )}
 
-                    <Form.Group className="mb-3" controlId="formBasicEmail" >
-                        <Button variant="primary" type="submit">
-                            Сохранить
-                        </Button>
-                    </Form.Group>
-                </Form>
+                <Form.Group className="mb-3">
+                    <Form.Label>Продолжительность</Form.Label>
+                    <Form.Control
+                        type={"number"}
+                        style={{display: "inline", width: "60px"}}
+                        className={"m-2"} size={"sm"} min={0} max={23}
+                        {...register("durationHours")}
+                    ></Form.Control> часов
+                    <Form.Control
+                        type={"number"}
+                        style={{display: "inline", width: "60px"}}
+                        className={"m-2"} size={"sm"} min={0} max={59}
+                        {...register("durationMin")}
+                    ></Form.Control> минут
+                </Form.Group>
+
+                {formErrors && (
+                    <Alert variant={"danger"}>{formErrors}</Alert>
+                )}
+
+                <Form.Group className="mb-3">
+                    <Button variant="primary"
+                            onClick={handleSubmit(onSubmit)}
+                    >
+                        Сохранить
+                    </Button>
+                </Form.Group>
+                {/*</Form>*/}
             </Modal.Body>
         </Modal>
     )
