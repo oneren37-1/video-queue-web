@@ -125,6 +125,7 @@ export const schedulerSlice = createSlice({
                 console.log("editSchedule.rejected");
                 console.log(action.payload)
             })
+
             .addCase(dropQueue.pending, (state) => {
                 state.updateStatus = 'loading';
             })
@@ -141,6 +142,7 @@ export const schedulerSlice = createSlice({
                 console.log("dropQueue.rejected");
                 console.log(action.payload)
             })
+
             .addCase(upQueue.pending, (state) => {
                 state.updateStatus = 'loading';
             })
@@ -164,6 +166,7 @@ export const schedulerSlice = createSlice({
                 console.log("upQueue.rejected");
                 console.log(action.payload)
             })
+
             .addCase(downQueue.pending, (state) => {
                 state.updateStatus = 'loading';
             })
@@ -188,8 +191,33 @@ export const schedulerSlice = createSlice({
                 console.log("downQueue.rejected");
                 console.log(action.payload)
             })
+
+            .addCase(deleteScheduler.pending, (state) => {
+                state.deleteStatus = 'loading';
+            })
+            .addCase(deleteScheduler.fulfilled, (state, action) => {
+                state.deleteStatus = 'ok';
+            })
+            .addCase(deleteScheduler.rejected, (state, action) => {
+                state.deleteStatus = 'failed';
+                console.log("deleteScheduler.rejected");
+                console.log(action.payload)
+            })
     }
 })
+
+export const deleteScheduler = createAsyncThunk(
+    'queue/deleteScheduler',
+    async (schedulerId: string): Promise<any> => {
+        return useWSAuthedRequest({
+            type: "delete",
+            entity: "scheduler",
+            id: schedulerId,
+        }).then((res: any) => {
+            if (res.payload === "error") throw new Error("Error");
+            return schedulerId;
+        })
+    })
 
 export const upQueue = createAsyncThunk(
     'scheduler/upQueue',
