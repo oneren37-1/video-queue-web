@@ -1,8 +1,10 @@
 import React, {useEffect} from 'react';
-import {Button, ButtonGroup} from "react-bootstrap";
+import {Button, ButtonGroup, Col, Container, Form} from "react-bootstrap";
 import {useParams} from "react-router-dom";
 import {useAppDispatch, useAppSelector, useWebsocket, useWSAuthedRequest} from "../app/hooks";
-import {setCurrentMedia} from "../store/displays";
+import {changeScheduler, setCurrentMedia} from "../store/displays";
+import {changeDefaultQueue, loadScheduler} from "../store/scheduler";
+import {loadSchedulers} from "../store/schedulers";
 
 const Display = () => {
 
@@ -35,6 +37,7 @@ const Display = () => {
     const currMedia = useAppSelector((state) => state.displays.displays.find(d => d.id == id)?.currentMedia);
 
     useEffect(() => {
+        dispatch(loadSchedulers());
         // eslint-disable-next-line react-hooks/rules-of-hooks
         const ws = useWebsocket();
         const handler = (e: any) => {
@@ -46,6 +49,15 @@ const Display = () => {
         return () => { ws.removeEventListener("message", handler) }
     }, []);
 
+    const schedulerId = useAppSelector((state) => state.displays.displays.find(d => d.id == id)?.scheduler);
+
+    const schedulers = [
+        {
+            id: "null",
+            name: "Без планировщика"
+        },
+        ...useAppSelector((state) => state.schedulers.schedulers)];
+
     return (
         <div>
             {!id && (
@@ -54,6 +66,8 @@ const Display = () => {
             {id && (
                 <>
                     <h1>{name}</h1>
+                    <h1>{schedulerId}</h1>
+
                     <ButtonGroup>
                         <Button
                             onClick={handleResume}
@@ -116,15 +130,28 @@ const Display = () => {
                         </Button>
 
                     </ButtonGroup>
-                    { status !== 'unknown' && (
-                        <>
-                            <div>Используется <a href="#">Главный планировщик</a></div>
-                            <Button className="mt-2" size="sm" variant="outline-secondary">Сменить планировщик</Button>
-                        </>
-                    )}
-                    { status === 'unknown' && (
-                        <Button size="sm" variant="primary">Назначить планировщик</Button>
-                    )}
+
+                    <div
+                        style={{
+                            maxWidth: "200px",
+                            marginTop: "20px"
+                        }}
+                    >
+                        <Col xs="auto">
+                            <Form.Select
+                                className={"col-sm"}
+                                onChange={(e) => {
+                                    dispatch(changeScheduler({displayId: id || "", schedulerId: e.target.value}))
+                                }}
+                                // @ts-ignore
+                                value={schedulerId}
+                            >
+                                {schedulers && schedulers.map(scheduler => (
+                                    <option value={scheduler.id || "null"}>{scheduler.name}</option>
+                                ))}
+                            </Form.Select>
+                        </Col>
+                    </div>
 
                     {currMedia && (
                         <>

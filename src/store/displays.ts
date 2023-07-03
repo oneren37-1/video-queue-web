@@ -6,7 +6,7 @@ import {useWebsocket, useWebSocketRequest, useWSAuthedRequest} from "../app/hook
 export type Display = {
     id: string;
     name: string;
-    schedulerId: string | null;
+    scheduler: string | null;
     currentMedia: {
         contentName: string;
         contentId: string;
@@ -53,6 +53,20 @@ export const displaysSlice = createSlice({
             })
     }
 })
+
+export const changeScheduler = createAsyncThunk(
+    'displays/changeScheduler',
+    async (args: {displayId: string, schedulerId: string | null}): Promise<any> => {
+        return useWSAuthedRequest({
+            type: "update",
+            entity: "display",
+            id: args.displayId,
+            payload: JSON.stringify({
+                action: "changeScheduler",
+                schedulerId: args.schedulerId
+            })
+        })
+    })
 
 export const loadDisplays = createAsyncThunk(
     'displays/load',
