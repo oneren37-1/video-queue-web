@@ -190,55 +190,56 @@ const CronDays = (props: any) => {
                     values={weekdays} />}
             </Form.Group>
 
-            <Form.Group>
-                <Form.Check
-                    type="radio"
-                    label="N-ное вхождение опреленного дня недели в месяце"
-                    name="cron-days"
-                    onClick={() => {
-                        setActiveTab("#");
-                        setStateM("?");
-                        setStateW(`${weekdaysAlias[weekdays.indexOf(nthWeekdayValue[1])]}#${nthWeekdayValue[0]}`);
-                    }}
-                    checked={activeTab === "#"}
-                    onChange={() => {}} // to avoid warning
-                />
-                {activeTab == "#" && (
-                    <>
-                        <Form.Select
-                            size={"sm"}
-                            style={{display: "inline-block", width: "80px"}}
-                            onChange={(e) => {
-                                const value = e.target.value;
-                                setNthWeekdayValue([value, nthWeekdayValue[1]]);
-                                setStateM("?");
-                                setStateW(`${nthWeekdayValue[1]}#${value}`);
-                            }}
-                            value={nthWeekdayValue[0]}
-                        >
-                            {new Array(5).fill(0).map((_, i) => <option key={i}>{i+1}</option>)}
-                        </Form.Select>
-                        <Form.Select
-                            size={"sm"}
-                            style={{display: "inline-block", width: "80px"}}
-                            onChange={(e) => {
-                                const value = e.target.value;
-                                let index = weekdays.indexOf(value);
-                                if (index === 6) index = -1;
-                                index += 2
+            {/*<Form.Group>*/}
+            {/*    <Form.Check*/}
+            {/*        type="radio"*/}
+            {/*        label="N-ное вхождение опреленного дня недели в месяце"*/}
+            {/*        name="cron-days"*/}
+            {/*        onClick={() => {*/}
+            {/*            setActiveTab("#");*/}
+            {/*            setStateM("?");*/}
+            {/*            setNthWeekdayValue(["1", "1"])*/}
+            {/*            setStateW(`${nthWeekdayValue[1]}#${nthWeekdayValue[0]}`);*/}
+            {/*        }}*/}
+            {/*        checked={activeTab === "#"}*/}
+            {/*        onChange={() => {}} // to avoid warning*/}
+            {/*    />*/}
+            {/*    {activeTab == "#" && (*/}
+            {/*        <>*/}
+            {/*            <Form.Select*/}
+            {/*                size={"sm"}*/}
+            {/*                style={{display: "inline-block", width: "80px"}}*/}
+            {/*                onChange={(e) => {*/}
+            {/*                    const value = e.target.value;*/}
+            {/*                    setNthWeekdayValue([value, nthWeekdayValue[1]]);*/}
+            {/*                    setStateM("?");*/}
+            {/*                    setStateW(`${nthWeekdayValue[1] || 1}#${value}`);*/}
+            {/*                }}*/}
+            {/*                value={nthWeekdayValue[0]}*/}
+            {/*            >*/}
+            {/*                {new Array(5).fill(0).map((_, i) => <option key={i}>{i+1}</option>)}*/}
+            {/*            </Form.Select>*/}
+            {/*            <Form.Select*/}
+            {/*                size={"sm"}*/}
+            {/*                style={{display: "inline-block", width: "80px"}}*/}
+            {/*                onChange={(e) => {*/}
+            {/*                    const value = e.target.value;*/}
+            {/*                    let index = weekdays.indexOf(value);*/}
+            {/*                    if (index === 6) index = -1;*/}
+            {/*                    index += 2*/}
 
-                                setNthWeekdayValue([nthWeekdayValue[0], index.toString()]);
-                                setStateM("?");
-                                setStateW(`${index}#${nthWeekdayValue[0]}`);
-                            }}
-                            // @ts-ignore
-                            value={nthWeekdayValue[1] === "1" ? weekdays[6] : weekdays[parseInt(nthWeekdayValue[1])-2]}
-                        >
-                            {weekdays.map((v, i) => <option key={i}>{v}</option>)}
-                        </Form.Select>
-                    </>
-                )}
-            </Form.Group>
+            {/*                    setNthWeekdayValue([nthWeekdayValue[0], index.toString()]);*/}
+            {/*                    setStateM("?");*/}
+            {/*                    setStateW(`${index}#${nthWeekdayValue[0]}`);*/}
+            {/*                }}*/}
+            {/*                // @ts-ignore*/}
+            {/*                value={nthWeekdayValue[1] === "1" ? weekdays[6] : weekdays[parseInt(nthWeekdayValue[1])-2]}*/}
+            {/*            >*/}
+            {/*                {weekdays.map((v, i) => <option key={i}>{v}</option>)}*/}
+            {/*            </Form.Select>*/}
+            {/*        </>*/}
+            {/*    )}*/}
+            {/*</Form.Group>*/}
         </div>
     )
 }
