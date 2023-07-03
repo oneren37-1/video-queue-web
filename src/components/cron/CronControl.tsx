@@ -25,8 +25,8 @@ const CronControl = (props: ICronControlProps) => {
     const [minState, setMinState] = useState<string>(parts[1])
     const [hourState, setHourState] = useState<string>(parts[2])
     const [dayMState, setDayMState] = useState<string>(parts[3])
-    const [dayWState, setDayWState] = useState<string>(parts[4])
-    const [monthState, setMonthState] = useState<string>(parts[5])
+    const [monthState, setMonthState] = useState<string>(parts[4])
+    const [dayWState, setDayWState] = useState<string>(parts[5])
 
     const getCronString = () => {
         return `0 ${minState} ${hourState} ${dayMState} ${monthState} ${dayWState} *`
@@ -62,8 +62,8 @@ const CronControl = (props: ICronControlProps) => {
                 { activeTab === "month" && <CronMonth state={monthState} setState={setMonthState} /> }
             </Card.Body>
             <Card.Footer className="text-muted">
-                {CronHumanize.humanize(`0 ${minState || 0} ${hourState} ${dayMState} ${monthState} ${dayWState} *`)}
-                {/*<div>{`0 ${minState || 0} ${hourState} ${dayMState} ${monthState} ${dayWState} *`}</div>*/}
+                {CronHumanize.humanize(getCronString())}
+                <div>{getCronString()}</div>
             </Card.Footer>
         </Card>
     )

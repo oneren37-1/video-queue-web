@@ -3,10 +3,11 @@ import {Button, ButtonGroup, Card, Modal, Stack, ToggleButton} from "react-boots
 import CronHumanize from "../utils/cronHumanize";
 import EditScheduledQueueModal from "./modals/EditScheduledQueueModal";
 import {useAppDispatch} from "../app/hooks";
-import {dropQueue} from "../store/scheduler";
+import {downQueue, dropQueue, upQueue} from "../store/scheduler";
+import {useSelector} from "react-redux";
 
 const ScheduledQueueCard = (props: any) => {
-    const {id, queue, cron, duration, emitTime, schedulerId} = props;
+    const {id, queue, cron, duration, emitTime, schedulerId, isFirst, isLast} = props;
     const [RemoveQueueModalShow, setRemoveQueueModalShow] = React.useState(false);
 
     const [editModalShow, setEditModalShow] = React.useState(false);
@@ -24,6 +25,8 @@ const ScheduledQueueCard = (props: any) => {
 
     const dispatch = useAppDispatch();
 
+    const updateStatus = useSelector((state: any) => state.scheduler.updateStatus);
+
     const handleDrop = (itemId: string) => {
         dispatch(dropQueue({id: schedulerId, itemId}))
     }
@@ -38,9 +41,11 @@ const ScheduledQueueCard = (props: any) => {
                     </Card.Text>
                 )}
                 {cron && (
-                    <Card.Text>
-                        {CronHumanize.humanize(cron)}
-                    </Card.Text>
+                    <>
+                        <Card.Text>
+                            {CronHumanize.humanize(cron)}
+                        </Card.Text>
+                    </>
                 )}
                 {duration && (
                     <Card.Text>
@@ -51,20 +56,32 @@ const ScheduledQueueCard = (props: any) => {
             <Card.Footer>
                 <Stack direction="horizontal" gap={2}>
                     <ButtonGroup>
-                        <Button size="sm" variant="outline-secondary" className="pb-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                                 className="bi bi-arrow-up" viewBox="0 0 16 16">
-                                <path fillRule="evenodd"
-                                      d="M8 15a.5.5 0 0 0 .5-.5V2.707l3.146 3.147a.5.5 0 0 0 .708-.708l-4-4a.5.5 0 0 0-.708 0l-4 4a.5.5 0 1 0 .708.708L7.5 2.707V14.5a.5.5 0 0 0 .5.5z"/>
-                            </svg>
-                        </Button>
-                        <Button size="sm" variant="outline-secondary" className="pb-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                                 className="bi bi-arrow-down" viewBox="0 0 16 16">
-                                <path fillRule="evenodd"
-                                      d="M8 1a.5.5 0 0 1 .5.5v11.793l3.146-3.147a.5.5 0 0 1 .708.708l-4 4a.5.5 0 0 1-.708 0l-4-4a.5.5 0 0 1 .708-.708L7.5 13.293V1.5A.5.5 0 0 1 8 1z"/>
-                            </svg>
-                        </Button>
+                        {!isFirst && (
+                            <Button
+                                size="sm" variant="outline-secondary" className="pb-2"
+                                disabled={updateStatus === 'loading'}
+                                onClick={() => dispatch(upQueue({id: schedulerId, itemId: id}))}
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                     className="bi bi-arrow-up" viewBox="0 0 16 16">
+                                    <path fillRule="evenodd"
+                                          d="M8 15a.5.5 0 0 0 .5-.5V2.707l3.146 3.147a.5.5 0 0 0 .708-.708l-4-4a.5.5 0 0 0-.708 0l-4 4a.5.5 0 1 0 .708.708L7.5 2.707V14.5a.5.5 0 0 0 .5.5z"/>
+                                </svg>
+                            </Button>
+                        )}
+                        {!isLast && (
+                            <Button
+                                size="sm" variant="outline-secondary" className="pb-2"
+                                disabled={updateStatus === 'loading'}
+                                onClick={() => dispatch(downQueue({id: schedulerId, itemId: id}))}
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                     className="bi bi-arrow-down" viewBox="0 0 16 16">
+                                    <path fillRule="evenodd"
+                                          d="M8 1a.5.5 0 0 1 .5.5v11.793l3.146-3.147a.5.5 0 0 1 .708.708l-4 4a.5.5 0 0 1-.708 0l-4-4a.5.5 0 0 1 .708-.708L7.5 13.293V1.5A.5.5 0 0 1 8 1z"/>
+                                </svg>
+                            </Button>
+                        )}
                     </ButtonGroup>
                     <Button onClick={() => handleEdit()} size="sm" variant="outline-primary" className="pb-2">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"

@@ -57,7 +57,7 @@ const ScheduleQueueModal = (props: any) => {
             id: id,
             queueId: data.queueId,
             queueName: queuesNames.find((q) => q.id === data.queueId)?.name,
-            duration: +data.durationHours + (data.durationMin * 60),
+            duration: +data.durationMin + (data.durationHours * 60),
             cron: data.isCron ? cronInput : null,
             date: data.isCron ? null : data.date + " " + data.time,
         }))

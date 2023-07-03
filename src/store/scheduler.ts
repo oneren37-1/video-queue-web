@@ -84,7 +84,17 @@ export const schedulerSlice = createSlice({
                     item.priority += 1;
                 })
 
-                state.queues.push(data)
+                state.queues.push({
+                    id: data.id,
+                    queue: {
+                        id: data.queueId,
+                        name: data.queueName,
+                    },
+                    priority: 0,
+                    cron: data.cron,
+                    duration: data.duration,
+                    emitTime: data.date
+                })
 
                 state.queues = state.queues.sort((a, b) => {
                     return a.priority - b.priority;
@@ -95,11 +105,12 @@ export const schedulerSlice = createSlice({
                 console.log("schedule.rejected");
                 console.log(action.payload)
             })
+
             .addCase(editSchedule.pending, (state) => {
                 state.updateStatus = 'loading';
             })
             .addCase(editSchedule.fulfilled, (state, action) => {
-                state.status = 'ok';
+                state.updateStatus = 'ok';
                 state.queues = state.queues.map(q => {
                     if (q.id === action.payload.itemId) {
                         q.cron = action.payload.cron;
@@ -110,7 +121,7 @@ export const schedulerSlice = createSlice({
                 })
             })
             .addCase(editSchedule.rejected, (state, action) => {
-                state.status = 'failed';
+                state.updateStatus = 'failed';
                 console.log("editSchedule.rejected");
                 console.log(action.payload)
             })
@@ -118,16 +129,101 @@ export const schedulerSlice = createSlice({
                 state.updateStatus = 'loading';
             })
             .addCase(dropQueue.fulfilled, (state, action) => {
-                state.status = 'ok';
-                state.queues = state.queues.filter(q => q.id !== action.payload.itemId);
+                state.updateStatus = 'ok';
+                const item = state.queues.find(q => q.id === action.payload.itemId);
+                state.queues = state.queues.map(q => {
+                    if (item && q.priority > item.priority) q.priority -= 1;
+                    return q
+                }).filter(q => q.id !== action.payload.itemId);
             })
             .addCase(dropQueue.rejected, (state, action) => {
-                state.status = 'failed';
+                state.updateStatus = 'failed';
                 console.log("dropQueue.rejected");
+                console.log(action.payload)
+            })
+            .addCase(upQueue.pending, (state) => {
+                state.updateStatus = 'loading';
+            })
+            .addCase(upQueue.fulfilled, (state, action) => {
+                state.updateStatus = 'ok';
+                const item = state.queues.find(q => q.id === action.payload.itemId);
+                state.queues = state.queues.map(q => {
+                    if (q.id === action.payload.itemId) {
+                        q.priority -= 1;
+                    } else if (item && q.priority === item.priority - 1) {
+                        q.priority += 1;
+                    }
+                    return q
+                })
+                state.queues = state.queues.sort((a, b) => {
+                    return a.priority - b.priority;
+                })
+            })
+            .addCase(upQueue.rejected, (state, action) => {
+                state.updateStatus = 'failed';
+                console.log("upQueue.rejected");
+                console.log(action.payload)
+            })
+            .addCase(downQueue.pending, (state) => {
+                state.updateStatus = 'loading';
+            })
+            .addCase(downQueue.fulfilled, (state, action) => {
+                state.updateStatus = 'ok';
+                const item = state.queues.find(q => q.id === action.payload.itemId);
+                const p = item?.priority || 0;
+                state.queues = state.queues.map(q => {
+                    if (+q.priority === p+1) {
+                        q.priority -= 1;
+                    } else if (q.id === action.payload.itemId) {
+                        q.priority += 1;
+                    }
+                    return q
+                })
+                state.queues = state.queues.sort((a, b) => {
+                    return a.priority - b.priority;
+                })
+            })
+            .addCase(downQueue.rejected, (state, action) => {
+                state.updateStatus = 'failed';
+                console.log("downQueue.rejected");
                 console.log(action.payload)
             })
     }
 })
+
+export const upQueue = createAsyncThunk(
+    'scheduler/upQueue',
+    async (data: any): Promise<any> => {
+        return useWSAuthedRequest({
+            type: "update",
+            entity: "scheduler",
+            id: data.id,
+            payload: JSON.stringify({
+                action: "upQueue",
+                itemId: data.itemId
+            })
+        }).then((res: any) => {
+            if (res.payload === "error") throw new Error("Error");
+            return data;
+        })
+    });
+
+export const downQueue = createAsyncThunk(
+    'scheduler/downQueue',
+    async (data: any): Promise<any> => {
+        return useWSAuthedRequest({
+            type: "update",
+            entity: "scheduler",
+            id: data.id,
+            payload: JSON.stringify({
+                action: "downQueue",
+                itemId: data.itemId
+            })
+        }).then((res: any) => {
+            if (res.payload === "error") throw new Error("Error");
+            return data;
+        })
+    });
 
 export const dropQueue = createAsyncThunk(
     'scheduler/dropQueue',
@@ -184,6 +280,7 @@ export const schedule = createAsyncThunk(
             })
         }).then((res: any) => {
             if (res.payload === "error") throw new Error("Error");
+            data.id = res.payload;
             return data;
         })
     });

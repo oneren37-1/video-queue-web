@@ -60,8 +60,8 @@ const CronDays = (props: any) => {
                     name="cron-days"
                     onClick={() => {
                         setActiveTab("every")
-                        setStateM("?");
-                        setStateW("*");
+                        setStateM("*");
+                        setStateW("?");
                     }}
                     checked={activeTab === "every"}
                     onChange={() => {}} // to avoid warning
@@ -198,7 +198,7 @@ const CronDays = (props: any) => {
                     onClick={() => {
                         setActiveTab("#");
                         setStateM("?");
-                        setStateW(`${nthWeekdayValue[1]}#${nthWeekdayValue[0]}`);
+                        setStateW(`${weekdaysAlias[weekdays.indexOf(nthWeekdayValue[1])]}#${nthWeekdayValue[0]}`);
                     }}
                     checked={activeTab === "#"}
                     onChange={() => {}} // to avoid warning
