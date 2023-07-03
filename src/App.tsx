@@ -5,7 +5,7 @@ import {useWebsocket} from "./app/hooks";
 import {RootState} from "./app/store";
 import {useSelector} from "react-redux";
 import Home from "./pages/Home";
-import {Route, Router, Routes} from "react-router-dom";
+import {Route, Router, Routes, useNavigate} from "react-router-dom";
 import Media from "./pages/Media";
 import Queues from "./pages/Queues";
 import Schedulers from "./pages/Schedulers";

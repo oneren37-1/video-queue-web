@@ -8,7 +8,7 @@ import { v4 as uuidv4 } from 'uuid';
 export const useAppDispatch = () => useDispatch<AppDispatch>();
 export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;
 
-export const WS = new WebSocket('ws://localhost:6969');
+export let WS = new WebSocket('ws://localhost:6969');
 WS.onopen = () => {
     console.log('connected');
 };
@@ -19,10 +19,9 @@ WS.onerror = (e) => {
     console.log('error');
     console.log(e);
 };
-WS.onclose = (e) => {
-    console.log('disconnected');
-    console.log(e);
-};
+WS.addEventListener('close', () => {
+    WS = new WebSocket('ws://localhost:6969')
+})
 
 
 export const useWebsocket = () => {
