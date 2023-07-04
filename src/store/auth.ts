@@ -19,7 +19,10 @@ export const authSlice = createSlice({
     name: 'auth',
     initialState,
     reducers: {
-        logout: (state) => initialState
+        logout: (state) => {
+            localStorage.setItem('auth', "");
+            return initialState;
+        }
     },
     extraReducers: (builder) => {
         builder
@@ -30,6 +33,10 @@ export const authSlice = createSlice({
                 state.status = 'ok';
                 state.hostId = action.payload.hostID;
                 state.password = action.payload.hostPassword;
+                localStorage.setItem('auth', JSON.stringify({
+                    hostId: action.payload.hostID,
+                    hostPassword: action.payload.hostPassword
+                }));
             })
             .addCase(login.rejected, (state, action) => {
                 state.status = 'failed';

@@ -16,6 +16,8 @@ const Auth = () => {
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
     const authStatus = useAppSelector((state: RootState) => state.auth.status);
+    const hostId = useAppSelector((state: RootState) => state.auth.hostId);
+    const password = useAppSelector((state: RootState) => state.auth.password);
 
     const {
         register,

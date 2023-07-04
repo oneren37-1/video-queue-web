@@ -36,7 +36,15 @@ export const useWebSocketRequest = async (data: any) => {
 
         data.message = data.message || {};
         data.message.requestId = requestId;
-        ws.send(JSON.stringify(data));
+
+        if (ws.readyState === ws.CONNECTING) {
+            ws.addEventListener('open', () => {
+                ws.send(JSON.stringify(data));
+            });
+        }
+        else {
+            ws.send(JSON.stringify(data));
+        }
 
         const timer = setTimeout(() => {
             reject ('Request timed out');

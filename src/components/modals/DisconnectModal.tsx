@@ -6,13 +6,13 @@ import {deleteQueue} from "../../store/queue";
 import {deleteScheduler} from "../../store/scheduler";
 import {logout} from "../../store/auth";
 
-const RemoveSchedulerModal = (props: any) => {
+const DisconnectModal = (props: any) => {
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
 
     const handleAuth = () => {
         dispatch(logout())
-        navigate("/auth")
+        window.location.href = "/auth";
     }
 
     return (
@@ -30,4 +30,4 @@ const RemoveSchedulerModal = (props: any) => {
     )
 }
 
-export default RemoveSchedulerModal
+export default DisconnectModal

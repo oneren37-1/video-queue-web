@@ -1,17 +1,24 @@
 import React from 'react';
-import {useAppSelector, useWebsocket} from "../app/hooks";
+import {useAppDispatch, useAppSelector, useWebsocket} from "../app/hooks";
 import {RootState} from "../app/store";
 import {useNavigate} from "react-router-dom";
 import Header from "../components/Header";
 import {Container} from "react-bootstrap";
 import DisconnectModal from "../components/modals/DisconnectModal";
+import {login} from "../store/auth";
 
 const PageLayout = (props: any) => {
     const authStatus = useAppSelector((state: RootState) => state.auth.status);
     const navigate = useNavigate();
+    const dispatch = useAppDispatch();
 
     React.useEffect(() => {
-        if (authStatus !== 'ok') navigate('/auth')
+        if (authStatus === 'idle') {
+            const authData = localStorage.getItem('auth')
+            if (!authData) navigate('/auth')
+            else dispatch(login(JSON.parse(authData)));
+        }
+        else if (authStatus === 'failed') window.location.href = "/auth";
     }, [authStatus])
 
     const ws = useWebsocket();
@@ -37,9 +44,11 @@ const PageLayout = (props: any) => {
     return (
         <>
             <Header />
-            <Container>
-                { props.children }
-            </Container>
+            {authStatus === 'ok' && (
+                <Container>
+                    { props.children }
+                </Container>
+            )}
             <DisconnectModal
                 show={disconnect}
             />
