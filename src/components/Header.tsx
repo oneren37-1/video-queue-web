@@ -19,6 +19,7 @@ const Header = () => {
                     <NavLink to={"/media"}>Медиа</NavLink>
                     <NavLink to={"/queues"}>Очереди</NavLink>
                     <NavLink to={"/schedulers"}>Планировщики</NavLink>
+                    <NavLink to={"/logs"}>Логи</NavLink>
                 </Stack>
 
 

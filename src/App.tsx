@@ -12,6 +12,7 @@ import Schedulers from "./pages/Schedulers";
 import QueuePage from "./pages/Queue";
 import Scheduler from "./pages/Scheduler";
 import Display from "./components/Display";
+import LogsPage from "./pages/Logs";
 
 function App() {
   const authStatus = useSelector((state: RootState) => state.auth.status);
@@ -22,6 +23,7 @@ function App() {
           <Route path="/" element={<Home />} >
               <Route path=":id" element={<Display />} />
           </Route>
+          <Route path="/logs" element={<LogsPage />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/media" element={<Media />} />
           <Route path="/queues" element={<Queues />} />

@@ -6,6 +6,7 @@ import queue from '../store/queue';
 import queues from "../store/queues";
 import scheduler from '../store/scheduler';
 import schedulers from "../store/schedulers";
+import logs from "../store/logs";
 
 export const store = configureStore({
   reducer: {
@@ -15,7 +16,8 @@ export const store = configureStore({
     queues,
     queue,
     schedulers,
-    scheduler
+    scheduler,
+    logs
   },
 });
 
