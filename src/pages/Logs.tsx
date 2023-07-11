@@ -14,7 +14,9 @@ const LogsPage = () => {
 
     return (
         <PageLayout>
-            {logs}
+            <pre>
+                {logs}
+            </pre>
         </PageLayout>
     )
 }

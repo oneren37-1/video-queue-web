@@ -2,6 +2,7 @@ import React from 'react';
 import {useAppDispatch, useAppSelector} from "../app/hooks";
 import {Card, Col, Container, ListGroup, Row, Spinner} from "react-bootstrap";
 import {loadMedia, Media} from "../store/media";
+import MediaCard from "./MediaCard";
 
 
 const MediaList = (props: any) => {
@@ -28,32 +29,6 @@ const MediaList = (props: any) => {
                 ))}
             </Row>
         </div>
-    )
-}
-
-const MediaCard = (props: any) => {
-    const [isSelected, setIsSelected] = React.useState(false);
-    const { id, name, img } = props.m
-
-    const handleClick = (id: string) => {
-        if (props.ToggleMediaPick) {
-            props.ToggleMediaPick(id);
-            setIsSelected(prev => !prev);
-        }
-    }
-
-    return (
-        <Card
-            border={isSelected ? "primary" : "secondary"}
-            style={{ transform: isSelected ? "scale(0.95)" : "scale(1)", transition: "all 0.2s ease-in-out"}}
-            onClick={() => handleClick(id)}
-        >
-            <Card.Img variant="top" src={img ? " data:image/jpeg;charset=utf-8;base64," + img  : "https://www.ballipolimer.com/wp-content/uploads/2020/08/img-placeholder.png"} />
-            <Card.Body>
-                {name.length <= 20 && <Card.Title>{name}</Card.Title>}
-                {name.length > 20 && <Card.Text>{name}</Card.Text>}
-            </Card.Body>
-        </Card>
     )
 }
 

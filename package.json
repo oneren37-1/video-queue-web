@@ -15,6 +15,7 @@
     "bootstrap-cron-picker": "^1.0.0",
     "bootstrap-icons": "^1.10.5",
     "cron-humanize": "^1.0.7",
+    "gh-pages": "^5.0.0",
     "react": "^18.2.0",
     "react-bootstrap": "^2.7.4",
     "react-cron-generator": "^2.0.8",
@@ -35,12 +36,15 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
+    "test:e2e": "cypress run --env type=actual",
+    "test:e2e:base": "cypress run --env type=base",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
     "extends": [
       "react-app",
-      "react-app/jest"
+      "react-app/jest",
+      "plugin:cypress/recommended"
     ]
   },
   "browserslist": {
@@ -56,6 +60,9 @@
     ]
   },
   "devDependencies": {
-    "@types/uuid": "^9.0.2"
+    "@types/uuid": "^9.0.2",
+    "cypress": "^12.16.0",
+    "cypress-visual-regression": "^3.0.0",
+    "eslint-plugin-cypress": "^2.13.3"
   }
 }

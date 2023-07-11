@@ -190,13 +190,23 @@ const UploadFile = () => {
         fileReader.addEventListener('error', error => console.error('Error reading file:', error));
         fileReader.addEventListener('abort', event => console.log('File reading aborted:', event));
         fileReader.addEventListener('load', e => {
+            if (!dataChannel) return;
             // @ts-ignore
             dataChannel.send(e.target.result);
             // @ts-ignore
             offset += e.target.result.byteLength;
             setSendingProgress(offset/file.size*100);
             if (offset < file.size) {
-                readSlice(offset);
+                if (dataChannel.bufferedAmount > dataChannel.bufferedAmountLowThreshold) {
+                    dataChannel.onbufferedamountlow = () => {
+                        dataChannel.onbufferedamountlow = null;
+                        readSlice(offset);
+                    };
+                    return;
+                }
+                else {
+                    readSlice(offset);
+                }
             } else {
                 // @ts-ignore
                 dataChannel.send(JSON.stringify({
