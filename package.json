@@ -38,6 +38,8 @@
     "test": "react-scripts test",
     "test:e2e": "cypress run --env type=actual",
     "test:e2e:base": "cypress run --env type=base",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
