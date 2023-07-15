@@ -1,13 +1,13 @@
 {
   "files": {
     "main.css": "https://oneren37-1.github.io/video-queue-web/static/css/main.222027ba.css",
-    "main.js": "https://oneren37-1.github.io/video-queue-web/static/js/main.3306ec2b.js",
+    "main.js": "https://oneren37-1.github.io/video-queue-web/static/js/main.106a6854.js",
     "index.html": "https://oneren37-1.github.io/video-queue-web/index.html",
     "main.222027ba.css.map": "https://oneren37-1.github.io/video-queue-web/static/css/main.222027ba.css.map",
-    "main.3306ec2b.js.map": "https://oneren37-1.github.io/video-queue-web/static/js/main.3306ec2b.js.map"
+    "main.106a6854.js.map": "https://oneren37-1.github.io/video-queue-web/static/js/main.106a6854.js.map"
   },
   "entrypoints": [
     "static/css/main.222027ba.css",
-    "static/js/main.3306ec2b.js"
+    "static/js/main.106a6854.js"
   ]
 }
