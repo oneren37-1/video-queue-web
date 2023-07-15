@@ -18,7 +18,7 @@ const PageLayout = (props: any) => {
             if (!authData) navigate('/auth')
             else dispatch(login(JSON.parse(authData)));
         }
-        else if (authStatus === 'failed') window.location.href = "/auth";
+        else if (authStatus === 'failed') navigate("/auth");
     }, [authStatus])
 
     const ws = useWebsocket();

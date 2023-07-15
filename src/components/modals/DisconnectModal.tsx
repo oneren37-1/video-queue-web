@@ -12,7 +12,7 @@ const DisconnectModal = (props: any) => {
 
     const handleAuth = () => {
         dispatch(logout())
-        window.location.href = "/auth";
+        navigate("/auth")
     }
 
     return (
