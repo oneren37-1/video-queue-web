@@ -6,7 +6,7 @@ import DisplaysList from "../components/DisplaysList";
 import Scheduler from "./Scheduler";
 import {useAppSelector} from "../app/hooks";
 import {RootState} from "../app/store";
-import {Outlet, Route, Routes, useNavigate} from "react-router-dom";
+import {Outlet, Route, Routes, useLocation, useNavigate} from "react-router-dom";
 import Display from "../components/Display";
 import PageLayout from "./PageLayout";
 import Auth from "./Auth";
@@ -18,6 +18,15 @@ import Schedulers from "./Schedulers";
 const Home = () => {
 
     const isDesktop = useMediaQuery({ query: '(min-width: 700px)' })
+    const location = useLocation();
+    const navigate = useNavigate();
+    const displays = useAppSelector((state: RootState) => state.displays.displays);
+
+    React.useEffect(() => {
+        if (location.pathname === '/' && displays.length !== 0) {
+            navigate(`/${displays[0].id}`)
+        }
+    }, [location, displays])
 
     return (
         <PageLayout>
