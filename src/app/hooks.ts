@@ -13,7 +13,7 @@ WS.onopen = () => {
     console.log('connected');
 };
 WS.addEventListener('message', (e) => {
-    console.log('message received: ' + e.data);
+    // console.log('message received: ' + e.data);
 });
 WS.onerror = (e) => {
     console.log('error');

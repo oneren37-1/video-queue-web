@@ -4,7 +4,7 @@ import {useAppDispatch, useAppSelector} from "../app/hooks";
 import {Card, ListGroup} from "react-bootstrap";
 import {NavLink} from "react-router-dom";
 
-const DisplaysList = () => {
+const DisplaysList = (props: any) => {
     const displays: Display[] = useAppSelector((state) => state.displays.displays);
     const dispatch = useAppDispatch();
 
@@ -13,7 +13,7 @@ const DisplaysList = () => {
     }, [])
 
     return (
-        <ListGroup>
+        <ListGroup {...props}>
             {displays.map && displays.map((display, i) => (
                 <DisplaysListItem key={i} {...display} />
             ))}
