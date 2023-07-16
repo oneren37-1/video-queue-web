@@ -32,7 +32,7 @@ const ScheduledQueueCard = (props: any) => {
     }
 
     return (
-        <Card style={{ width: '40rem' }} >
+        <Card >
             <Card.Body>
                 <Card.Title>{ queue.name }</Card.Title>
                 {emitTime && (
