@@ -48,7 +48,7 @@ const EditScheduledQueueModal = (props: any) => {
             return;
         }
 
-        if (!(data.durationHours + data.durationMin * 60)) {
+        if (!(+data.durationMin + (data.durationHours * 60))) {
             setFormErrors("Необходимо указать длительность очереди");
             return;
         }
@@ -56,7 +56,7 @@ const EditScheduledQueueModal = (props: any) => {
         dispatch(editSchedule({
             id: schedulerId,
             itemId: id,
-            duration: +data.durationHours + (data.durationMin * 60),
+            duration: +data.durationMin + (data.durationHours * 60),
             cron: data.isCron ? cronInput : null,
             date: data.isCron ? null : data.date + " " + data.time,
         }))
