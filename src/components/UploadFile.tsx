@@ -1,6 +1,6 @@
 import React from 'react';
 import {Alert, Button, Card, Form, ProgressBar, Stack} from "react-bootstrap";
-import {useWebsocket} from "../app/hooks";
+import {useAppSelector, useWebsocket} from "../app/hooks";
 
 const UploadFile = () => {
 
@@ -13,6 +13,8 @@ const UploadFile = () => {
     const [peerConnection, setPeerConnection] = React.useState<RTCPeerConnection | null>(null);
     const [dataChannel, setDataChannel] = React.useState<RTCDataChannel | null>(null);
 
+    const hostId = useAppSelector((state) => state.auth.hostId)
+    const hostPassword = useAppSelector((state) => state.auth.password)
 
     React.useEffect(() => {
         if (!peerConnection) {
@@ -53,7 +55,7 @@ const UploadFile = () => {
                 socket.send(JSON.stringify({
                     role: 'client',
                     type: 'iceCandidate',
-                    hostID: '123',
+                    hostID: hostId,
                     message: JSON.stringify({
                         type: 'iceCandidate',
                         payload: JSON.stringify(event.candidate)
@@ -112,7 +114,7 @@ const UploadFile = () => {
                 socket.send(JSON.stringify({
                     role: 'client',
                     type: 'offer',
-                    hostID: '123',
+                    hostID: hostId,
                     message: JSON.stringify({
                         type: 'offer',
                         payload: JSON.stringify(offer.sdp)

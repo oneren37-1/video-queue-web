@@ -9,19 +9,23 @@ export const useAppDispatch = () => useDispatch<AppDispatch>();
 export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;
 
 export let WS = new WebSocket('wss://oneren.space');
-WS.onopen = () => {
-    console.log('connected');
-};
-WS.addEventListener('message', (e) => {
-    // console.log('message received: ' + e.data);
-});
-WS.onerror = (e) => {
-    console.log('error');
-    console.log(e);
-};
-WS.addEventListener('close', () => {
-    WS = new WebSocket('wss://oneren.space')
-})
+export const initWS = (ws: WebSocket) => {
+    WS.onopen = () => {
+        console.log('connected');
+    };
+    WS.addEventListener('message', (e) => {
+        console.log('message received: ' + e.data);
+    });
+    WS.onerror = (e) => {
+        console.log('error');
+        console.log(e);
+    };
+    WS.addEventListener('close', () => {
+        WS = new WebSocket('wss://oneren.space')
+    })
+}
+
+initWS(WS)
 
 
 export const useWebsocket = () => {
@@ -43,7 +47,13 @@ export const useWebSocketRequest = async (data: any) => {
             });
         }
         else {
-            ws.send(JSON.stringify(data));
+            try {
+                ws.send(JSON.stringify(data));
+            }
+            catch (e) {
+                // eslint-disable-next-line no-restricted-globals
+                location.reload();
+            }
         }
 
         const timer = setTimeout(() => {
