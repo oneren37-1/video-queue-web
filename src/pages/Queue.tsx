@@ -1,9 +1,9 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {useParams} from "react-router-dom";
 import PageLayout from "./PageLayout";
 import {Button, Card, Container, Stack, Image, Col, Row, ListGroup, Alert, Spinner} from "react-bootstrap";
 import AddMediaModal from "../components/modals/AddMediaModal";
-import {useAppDispatch, useAppSelector} from "../app/hooks";
+import {useAppDispatch, useAppSelector, useWSAuthedRequest} from "../app/hooks";
 import {loadQueue, removeMedia} from "../store/queue";
 import {moveMediaDown, moveMediaUp} from '../store/queue';
 import RenameQueueModal from "../components/modals/RenameQueueModal";
@@ -20,7 +20,6 @@ const QueuePage = () => {
         dispatch(loadQueue(`${id}`))
     }, [])
 
-    const updateStatus = useAppSelector((state) => state.queue.updateStatus);
     const loadStatus = useAppSelector((state) => state.queue.status);
 
     const name = useAppSelector((state) => state.queue.name)
@@ -82,65 +81,12 @@ const QueuePage = () => {
                             {(!mediaList || mediaList.length === 0) && <ListGroup.Item>Очередь пуста</ListGroup.Item>}
                             {mediaList && mediaList
                                 .map(m => m.media)
-                                .map((m, i) => (
-                                    <ListGroup.Item key={i}>
-                                        <Row className={"mb-1"} key={i}>
-                                            <Col xs={1} style={{
-                                                display: "flex",
-                                                justifyContent: "center",
-                                                alignItems: "center",
-                                                flexDirection: "column"
-                                            }}>
-                                                {i !== 0 && (
-                                                    <Button
-                                                        disabled={updateStatus === "loading"}
-                                                        onClick={() => dispatch(moveMediaUp({queueId: id||"", mediaId: m.id}))}
-                                                        size={"sm"}
-                                                        variant={"light"}>
-                                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                                                             className="bi bi-chevron-up" viewBox="0 0 16 16">
-                                                            <path fillRule="evenodd"
-                                                                  d="M7.646 4.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 5.707l-5.646 5.647a.5.5 0 0 1-.708-.708l6-6z"/>
-                                                        </svg>
-                                                    </Button>
-                                                )}
-                                                {i !== mediaList.length-1 && (
-                                                    <Button
-                                                        disabled={updateStatus === "loading"}
-                                                        onClick={() => dispatch(moveMediaDown({queueId: id||"", mediaId: m.id}))}
-                                                        size={"sm"}
-                                                        variant={"light"}>
-                                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                                                             className="bi bi-chevron-down" viewBox="0 0 16 16">
-                                                            <path fillRule="evenodd"
-                                                                  d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/>
-                                                        </svg>
-                                                    </Button>
-                                                )}
-                                            </Col>
-
-                                            <Col className={"d-flex"}>
-                                                <Image src={m.img ? " data:image/jpeg;charset=utf-8;base64," + m.img  : "https://www.ballipolimer.com/wp-content/uploads/2020/08/img-placeholder.png"} rounded style={{width: "150px", marginRight: "15px"}}/>
-                                                {m.name.length <= 20 && <Card.Title>{m.name}</Card.Title>}
-                                                {m.name.length > 20 && <Card.Text>{m.name}</Card.Text>}
-                                            </Col>
-                                            <Col xs={1}>
-                                                <Button
-                                                    disabled={updateStatus === "loading"}
-                                                    onClick={() => dispatch(removeMedia({queueId: id||"", mediaId: m.id}))}
-                                                    size={"sm"}
-                                                    variant={"outline-danger"}
-                                                >
-                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-                                                         fill="currentColor" className="bi bi-x-lg" viewBox="0 0 16 16">
-                                                        <path
-                                                            d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z"/>
-                                                    </svg>
-                                                </Button>
-                                            </Col>
-                                        </Row>
-                                    </ListGroup.Item>
-                                ))}
+                                .map((m, i) => <MediaItem
+                                    m={m} key={i}
+                                    isFirst={i===0}
+                                    isLast={i === mediaList.length-1}
+                                    queueId={id}
+                                />)}
                         </ListGroup>
                     </Card>
                     <RemoveQueueModal
@@ -158,6 +104,98 @@ const QueuePage = () => {
                 </>
             )}
         </PageLayout>
+    )
+}
+
+export const MediaItem = (props: any) => {
+    const [img, setImg] = React.useState('');
+    const [imgLoadingState, setImgLoadingState] = useState<'idle'|'loading'|'ok'|'failed'>('idle');
+    const updateStatus = useAppSelector((state) => state.queue.updateStatus);
+
+    const dispatch = useAppDispatch();
+    const { m, queueId } = props;
+
+    React.useEffect(() => {
+        setImgLoadingState('loading')
+        setImg("")
+        // eslint-disable-next-line react-hooks/rules-of-hooks
+        useWSAuthedRequest({
+            type: "get",
+            entity: "img",
+            id: m.id
+        }).then((res: any) => {
+            console.log(res)
+            if (res.payload === "error") {
+                setImgLoadingState('failed')
+                return;
+            }
+            setImgLoadingState('ok')
+            setImg(res.payload)
+            return;
+        })
+    }, [m.id])
+
+    return (
+        <ListGroup.Item key={props.key}>
+            <Row className={"mb-1"}>
+                <Col xs={1} style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    flexDirection: "column"
+                }}>
+                    {!props.isFirst && (
+                        <Button
+                            disabled={updateStatus === "loading"}
+                            onClick={() => dispatch(moveMediaUp({queueId: queueId||"", mediaId: m.id}))}
+                            size={"sm"}
+                            variant={"light"}>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                 className="bi bi-chevron-up" viewBox="0 0 16 16">
+                                <path fillRule="evenodd"
+                                      d="M7.646 4.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 5.707l-5.646 5.647a.5.5 0 0 1-.708-.708l6-6z"/>
+                            </svg>
+                        </Button>
+                    )}
+                    {!props.isLast && (
+                        <Button
+                            disabled={updateStatus === "loading"}
+                            onClick={() => dispatch(moveMediaDown({queueId: queueId||"", mediaId: m.id}))}
+                            size={"sm"}
+                            variant={"light"}>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                 className="bi bi-chevron-down" viewBox="0 0 16 16">
+                                <path fillRule="evenodd"
+                                      d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/>
+                            </svg>
+                        </Button>
+                    )}
+                </Col>
+
+                <Col className={"d-flex"}>
+                    <Image src={img ? " data:image/jpeg;charset=utf-8;base64," + img  : "https://www.ballipolimer.com/wp-content/uploads/2020/08/img-placeholder.png"} rounded style={{width: "150px", marginRight: "15px"}}/>
+                    <div>
+                        {m.name.length <= 20 && <Card.Title>{m.name}</Card.Title>}
+                        {m.name.length > 20 && <Card.Text>{m.name}</Card.Text>}
+                        {`${String((Math.floor(m.duration/60))).padStart(2, '0')}:${String(m.duration % 60).padStart(2, '0')}`}
+                    </div>
+                </Col>
+                <Col xs={1}>
+                    <Button
+                        disabled={updateStatus === "loading"}
+                        onClick={() => dispatch(removeMedia({queueId: queueId||"", mediaId: m.id}))}
+                        size={"sm"}
+                        variant={"outline-danger"}
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                             fill="currentColor" className="bi bi-x-lg" viewBox="0 0 16 16">
+                            <path
+                                d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z"/>
+                        </svg>
+                    </Button>
+                </Col>
+            </Row>
+        </ListGroup.Item>
     )
 }
 

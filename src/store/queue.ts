@@ -202,7 +202,6 @@ export const addMediaToQueue = createAsyncThunk(
                 mediaId: data.mediaIds
             })
         }).then((res: any) => {
-            console.log(res)
             const dataParsed = JSON.parse(res.payload);
             if (!dataParsed.length) throw new Error("No queue found");
             return dataParsed;
