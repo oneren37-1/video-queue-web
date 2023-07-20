@@ -8,10 +8,11 @@ export type Display = {
     name: string;
     scheduler: string | null;
     currentMedia: {
-        contentName: string;
-        contentId: string;
+        name: string;
+        id: string;
         queueId: string;
-        queueName: string
+        queueName: string;
+        duration: string;
     }
 }
 export interface DisplaysState {
@@ -29,11 +30,11 @@ export const displaysSlice = createSlice({
     initialState,
     reducers: {
         setCurrentMedia(state, action) {
-            const { displayId, contentName, contentId, queueName, queueId} = action.payload
+            const { displayId, name, id, queueName, queueId, duration} = action.payload
             const display = state.displays
                 .find(display => display.id === displayId);
             if (display) {
-                display.currentMedia = { contentName, contentId, queueName, queueId };
+                display.currentMedia = { name, id, queueName, queueId, duration };
             }
         }
     },
@@ -44,7 +45,10 @@ export const displaysSlice = createSlice({
             })
             .addCase(loadDisplays.fulfilled, (state, action) => {
                 state.status = 'ok';
-                state.displays = JSON.parse(action.payload.payload);
+                state.displays = JSON.parse(action.payload.payload).map((e: any) => {
+                    e.currentMedia = JSON.parse(e.currentMedia)
+                    return e
+                });
             })
             .addCase(loadDisplays.rejected, (state, action) => {
                 state.status = 'failed';

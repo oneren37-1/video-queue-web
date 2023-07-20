@@ -1,10 +1,11 @@
 import React, {useEffect} from 'react';
-import {Button, ButtonGroup, Col, Container, Form} from "react-bootstrap";
-import {useParams} from "react-router-dom";
+import {Alert, Button, ButtonGroup, Col, Container, Form} from "react-bootstrap";
+import {NavLink, useParams} from "react-router-dom";
 import {useAppDispatch, useAppSelector, useWebsocket, useWSAuthedRequest} from "../app/hooks";
 import {changeScheduler, setCurrentMedia} from "../store/displays";
 import {changeDefaultQueue, loadScheduler} from "../store/scheduler";
 import {loadSchedulers} from "../store/schedulers";
+import MediaCard from "./MediaCard";
 
 const Display = () => {
 
@@ -36,6 +37,11 @@ const Display = () => {
     const dispatch = useAppDispatch();
     const currMedia = useAppSelector((state) => state.displays.displays.find(d => d.id == id)?.currentMedia);
 
+    React.useEffect(() => {
+        console.log(currMedia)
+    }, [currMedia])
+
+
     useEffect(() => {
         dispatch(loadSchedulers());
         // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -66,7 +72,7 @@ const Display = () => {
             {id && (
                 <>
                     <h1>{name}</h1>
-                    <h1>{schedulerId}</h1>
+                    {/*<h1>{schedulerId}</h1>*/}
 
                     <ButtonGroup>
                         <Button
@@ -156,8 +162,14 @@ const Display = () => {
                     {currMedia && (
                         <>
                             <h4 className="mt-3">Сейчас играет</h4>
-                            <strong>{currMedia.contentName}</strong><br/>
-                            <span>Из очереди <a href="#">{currMedia.queueName}</a></span>
+
+                            <div style={{ maxWidth: "400px" }}>
+                                <MediaCard m={currMedia} noEdit />
+
+                                <Alert variant={"light"} className={"mt-2"}>
+                                    <span>Из очереди <NavLink to={`/queue/${currMedia.queueId}`}>{currMedia.queueName}</NavLink></span>
+                                </Alert>
+                            </div>
                         </>
                     )}
                 </>
