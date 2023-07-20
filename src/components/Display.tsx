@@ -1,7 +1,7 @@
 import React, {useEffect} from 'react';
 import {Alert, Button, ButtonGroup, Col, Container, Form} from "react-bootstrap";
 import {NavLink, useParams} from "react-router-dom";
-import {useAppDispatch, useAppSelector, useWebsocket, useWSAuthedRequest} from "../app/hooks";
+import {handleSignal, useAppDispatch, useAppSelector, useWebsocket, useWSAuthedRequest} from "../app/hooks";
 import {changeScheduler, setCurrentMedia} from "../store/displays";
 import {changeDefaultQueue, loadScheduler} from "../store/scheduler";
 import {loadSchedulers} from "../store/schedulers";
@@ -14,25 +14,12 @@ const Display = () => {
     const { id } = useParams();
     const name = useAppSelector((state) => state.displays.displays.find(display => display.id === id)?.name);
 
-    const handlePause = () => handleSignal("pause")
-    const handleResume = () => handleSignal("resume")
-    const handleNext = () => handleSignal("next")
-    const handleStop = () => handleSignal("stop")
-    const handlePlay = () => handleSignal("run")
-    const handleRestart = () => handleSignal("restart")
-
-    const handleSignal = (signal: string) => {
-        // eslint-disable-next-line react-hooks/rules-of-hooks
-        useWSAuthedRequest({
-            type: "signal",
-            id: id,
-            signal: signal
-        }).then((response) => {
-            console.log(response);
-        }).catch((error) => {
-            console.log(error);
-        })
-    }
+    const handlePause = () => handleSignal("pause", id)
+    const handleResume = () => handleSignal("resume", id)
+    const handleNext = () => handleSignal("next", id)
+    const handleStop = () => handleSignal("stop", id)
+    const handlePlay = () => handleSignal("run", id)
+    const handleRestart = () => handleSignal("restart", id)
 
     const dispatch = useAppDispatch();
     const currMedia = useAppSelector((state) => state.displays.displays.find(d => d.id == id)?.currentMedia);

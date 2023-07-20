@@ -81,3 +81,16 @@ export const useWSAuthedRequest = async (data: any) => {
         message: data
     });
 }
+
+export const handleSignal = (signal: string, id?: string | undefined) => {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    useWSAuthedRequest({
+        type: "signal",
+        id: id || "",
+        signal: signal
+    }).then((response) => {
+        console.log(response);
+    }).catch((error) => {
+        console.log(error);
+    })
+}

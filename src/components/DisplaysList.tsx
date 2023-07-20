@@ -1,7 +1,7 @@
 import React from 'react';
 import {Display, loadDisplays} from "../store/displays";
-import {useAppDispatch, useAppSelector} from "../app/hooks";
-import {Card, ListGroup} from "react-bootstrap";
+import {handleSignal, useAppDispatch, useAppSelector} from "../app/hooks";
+import {Button, Card, ListGroup} from "react-bootstrap";
 import {NavLink} from "react-router-dom";
 
 const DisplaysList = (props: any) => {
@@ -13,11 +13,18 @@ const DisplaysList = (props: any) => {
     }, [])
 
     return (
-        <ListGroup {...props}>
-            {displays.map && displays.map((display, i) => (
-                <DisplaysListItem key={i} {...display} />
-            ))}
-        </ListGroup>
+        <>
+            <ListGroup {...props}>
+                {displays.map && displays.map((display, i) => (
+                    <DisplaysListItem key={i} {...display} />
+                ))}
+            </ListGroup>
+            <Button
+                variant={"outline-secondary"} size={"sm"}
+                className={"mt-2"}
+                onClick={() => handleSignal("identify")}
+            >Определить</Button>
+        </>
     )
 }
 
