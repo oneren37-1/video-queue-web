@@ -5,7 +5,7 @@ import AddSchedulerModal from "./modals/AddSchedulerModal";
 import EditContentModal from "./modals/EditContentModal";
 
 const MediaCard = (props: any) => {
-    const [isSelected, setIsSelected] = React.useState(false);
+    const [isSelected, setIsSelected] = React.useState(!!props.isSelected);
     const { id, name, duration, type } = props.m;
 
     const [imgLoadingState, setImgLoadingState] = useState<'idle'|'loading'|'ok'|'failed'>('idle');

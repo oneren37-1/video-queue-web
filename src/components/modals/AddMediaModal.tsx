@@ -33,13 +33,16 @@ const AddMediaModal = (props: any) => {
                         overflowX: "hidden"
                     }}
                 >
-                    <MediaList ToggleMediaPick={(id: string) => {
-                        if (mediaIds.includes(id)) {
-                            setMediaIds(mediaIds.filter((mediaId) => mediaId !== id))
-                        } else {
-                            setMediaIds([...mediaIds, id])
-                        }
-                    }}/>
+                    <MediaList
+                        ToggleMediaPick={(id: string) => {
+                            if (mediaIds.includes(id)) {
+                                setMediaIds(mediaIds.filter((mediaId) => mediaId !== id))
+                            } else {
+                                setMediaIds([...mediaIds, id])
+                            }
+                        }}
+                        SelectedMedia={mediaIds}
+                    />
                 </Card>
             </Modal.Body>
             <Modal.Footer>

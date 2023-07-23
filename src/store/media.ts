@@ -11,12 +11,14 @@ export type Media = {
 }
 export interface MediaState {
     media: Media[];
+    count: number;
     status: 'idle' | 'loading' | 'ok' | 'failed';
     updateStatus: 'idle' | 'loading' | 'ok' | 'failed';
 }
 
 const initialState: MediaState = {
     media: [],
+    count: 0,
     status: 'idle',
     updateStatus: 'idle'
 }
@@ -53,15 +55,33 @@ export const mediaSlice = createSlice({
             .addCase(editMedia.rejected, (state, action) => {
                 state.updateStatus = 'failed';
             })
+            .addCase(loadMediaCount.fulfilled, (state, action) => {
+                state.count = action.payload.payload;
+            })
+            .addCase(loadMediaCount.rejected, (state, action) => {
+                state.count = 0;
+            })
     }
 })
 
 export const loadMedia = createAsyncThunk(
     'media/load',
-    async (): Promise<any> => {
+    async (page: number): Promise<any> => {
         return useWSAuthedRequest({
             type: "get",
             entity: "content",
+            id: "*",
+            page: page
+        })
+    }
+)
+
+export const loadMediaCount = createAsyncThunk(
+    'media/loadMediaCount',
+    async (): Promise<any> => {
+        return useWSAuthedRequest({
+            type: "get",
+            entity: "content_count",
             id: "*"
         })
     }
