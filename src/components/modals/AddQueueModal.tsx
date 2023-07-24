@@ -29,6 +29,7 @@ const AddQueueModal = (props: any) => {
             name: data.name,
             mediaIds: mediaIds
         }))
+        props.onHide();
     }
 
     return (
@@ -40,7 +41,7 @@ const AddQueueModal = (props: any) => {
         >
             <Modal.Header closeButton>
                 <Modal.Title id="contained-modal-title-vcenter">
-                    Создание очедери
+                    Создание очереди
                 </Modal.Title>
             </Modal.Header>
             <Modal.Body>

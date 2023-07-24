@@ -162,6 +162,8 @@ export const queueSlice = createSlice({
 export const deleteQueue = createAsyncThunk(
     'queue/deleteQueue',
     async (queueId: string): Promise<any> => {
+        console.log("=====")
+        console.log(queueId)
         return useWSAuthedRequest({
             type: "delete",
             entity: "queue",

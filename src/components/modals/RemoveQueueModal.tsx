@@ -10,7 +10,7 @@ const RemoveQueueModal = (props: any) => {
     const navigate = useNavigate();
 
     const handleDelete = () => {
-        dispatch(deleteQueue(props.queueId))
+        dispatch(deleteQueue(props.id))
         navigate("/queues")
     }
 

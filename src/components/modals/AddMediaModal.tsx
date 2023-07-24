@@ -52,6 +52,7 @@ const AddMediaModal = (props: any) => {
                             queueId: props.queueId,
                             mediaIds: mediaIds
                         }))
+                        setMediaIds([])
                         props.onHide()
                     }}
                 >Добавить</Button>
