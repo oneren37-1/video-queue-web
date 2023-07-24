@@ -7,9 +7,11 @@ import MediaList from "../components/MediaList";
 const Media = () => {
     return (
         <PageLayout>
-            <div className={"mb-4"}>
-                <UploadFile />
-            </div>
+            {process.env.REACT_APP_FRONTEND_TYPE == "web" && (
+                <div className={"mb-4"}>
+                    <UploadFile />
+                </div>
+            )}
             <MediaList />
         </PageLayout>
     )

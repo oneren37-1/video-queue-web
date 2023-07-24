@@ -8,25 +8,16 @@ import { v4 as uuidv4 } from 'uuid';
 export const useAppDispatch = () => useDispatch<AppDispatch>();
 export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;
 
-export let WS = new WebSocket('wss://oneren.space');
+export const WSUrl = process.env.REACT_APP_FRONTEND_TYPE == "web" ? 'wss://oneren.space' : 'ws://localhost:6969'
+
+export let WS = new WebSocket(WSUrl);
 export const initWS = (ws: WebSocket) => {
-    WS.onopen = () => {
-        console.log('connected');
-    };
-    WS.addEventListener('message', (e) => {
-        console.log('message received: ' + e.data);
-    });
-    WS.onerror = (e) => {
-        console.log('error');
-        console.log(e);
-    };
     WS.addEventListener('close', () => {
-        WS = new WebSocket('wss://oneren.space')
+        WS = new WebSocket(WSUrl)
     })
 }
 
 initWS(WS)
-
 
 export const useWebsocket = () => {
     const ws = WS
@@ -71,8 +62,8 @@ export const useWebSocketRequest = async (data: any) => {
 
 export const useWSAuthedRequest = async (data: any) => {
     const state = store.getState();
-    const hostId = state.auth.hostId;
-    const hostPassword = state.auth.password;
+    const hostId = process.env.REACT_APP_FRONTEND_TYPE == "web" ? state.auth.hostId : "local";
+    const hostPassword = process.env.REACT_APP_FRONTEND_TYPE == "web" ? state.auth.password: "local";
 
     return useWebSocketRequest({
         role: 'client',

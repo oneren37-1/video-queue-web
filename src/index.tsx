@@ -11,7 +11,7 @@ const root = createRoot(container);
 
 root.render(
     <Provider store={store}>
-        <BrowserRouter basename="/video-queue-web">
+        <BrowserRouter basename={process.env.REACT_APP_FRONTEND_TYPE == "web" ? "/video-queue-web" : "/"}>
             <App />
         </BrowserRouter>
     </Provider>

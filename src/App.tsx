@@ -1,7 +1,7 @@
 import React from 'react';
 import Auth from "./pages/Auth";
 import 'bootstrap/dist/css/bootstrap.min.css';
-import {useWebsocket} from "./app/hooks";
+import {useAppDispatch, useWebsocket} from "./app/hooks";
 import {RootState} from "./app/store";
 import {useSelector} from "react-redux";
 import Home from "./pages/Home";
@@ -18,13 +18,19 @@ function App() {
   const authStatus = useSelector((state: RootState) => state.auth.status);
   useWebsocket();
 
+  console.log(process.env)
+
+  if (process.env.REACT_APP_FRONTEND_TYPE == "local") {
+      window.localStorage.setItem('auth', '{"hostId":"local","hostPassword":"local"}');
+  }
+
   return (
       <Routes>
           <Route path="/" element={<Home />} >
               <Route path=":id" element={<Display />} />
           </Route>
           <Route path="/logs" element={<LogsPage />} />
-          <Route path="/auth" element={<Auth />} />
+          {process.env.REACT_APP_FRONTEND_TYPE == "web" && (<Route path="/auth" element={<Auth />} />)}
           <Route path="/media" element={<Media />} />
           <Route path="/queues" element={<Queues />} />
           <Route path="/queue/:id" element={<QueuePage />} />

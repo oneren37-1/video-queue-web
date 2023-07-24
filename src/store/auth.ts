@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState, AppThunk } from '../app/store';
 
-import {useWebsocket, useWebSocketRequest} from "../app/hooks";
+import {useWebsocket, useWebSocketRequest, useWSAuthedRequest} from "../app/hooks";
 
 export interface AuthState {
     hostId: string | null;
@@ -41,8 +41,15 @@ export const authSlice = createSlice({
             .addCase(login.rejected, (state, action) => {
                 state.status = 'failed';
             })
+            .addCase(changePassword.fulfilled, (state, action) => {
+                state.password = action.payload;
+                localStorage.setItem('auth', JSON.stringify({
+                    hostId: state.hostId,
+                    hostPassword: action.payload
+                }));
+            });
     }
-})
+});
 
 export const login = createAsyncThunk(
     'auth/login',
@@ -59,6 +66,15 @@ export const login = createAsyncThunk(
         });
     }
 )
+
+export const changePassword = createAsyncThunk(
+    'auth/changePassword',
+    async (pass: string) => {
+        return useWSAuthedRequest({
+            type: "changePassword",
+            password: pass
+        }).then(() => pass);
+    })
 
 export const { logout } = authSlice.actions;
 export default authSlice.reducer;

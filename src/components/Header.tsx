@@ -5,12 +5,14 @@ import { useMediaQuery } from 'react-responsive'
 import DisplaysList from "./DisplaysList";
 import {logout} from "../store/auth";
 import {NavLink, useLocation} from "react-router-dom";
+import ChangePasswordModal from "./modals/ChangePasswordModal";
 
 const Header = () => {
     const hostId = useAppSelector((state) => state.auth.hostId);
     const isDesktop = useMediaQuery({ query: '(min-width: 700px)' })
     const dispatch = useAppDispatch();
     const [show, setShow] = React.useState(false);
+    const [showChangePasswordModal, setShowChangePasswordModal] = React.useState(false);
     const location = useLocation();
 
     useEffect(() => {
@@ -33,12 +35,26 @@ const Header = () => {
 
                 </Stack>
 
-                { isDesktop && (
+                { isDesktop && process.env.REACT_APP_FRONTEND_TYPE == "web" && (
                     <Button
                         variant="outline-secondary"
                         className="ms-auto"
                         onClick={() => {dispatch(logout())}}
-                    >Отключиться</Button>
+                    > Отключиться</Button>
+                )}
+
+                { isDesktop && process.env.REACT_APP_FRONTEND_TYPE == "local" && (
+                    <>
+                        <Button
+                            variant="outline-secondary"
+                            className="ms-auto"
+                            onClick={() => {setShowChangePasswordModal(true)}}
+                        >Сменить пароль</Button>
+                        <ChangePasswordModal
+                            show={showChangePasswordModal}
+                            onHide={() => setShowChangePasswordModal(false)}
+                        />
+                    </>
                 )}
 
                 { !isDesktop && (
@@ -76,11 +92,27 @@ const Header = () => {
                                     </ListGroup.Item>
                                 </ListGroup>
 
-                                <Button
-                                    variant="outline-secondary"
-                                    className="ms-auto mt-3"
-                                    onClick={() => {dispatch(logout())}}
-                                >Отключиться</Button>
+                                {process.env.REACT_APP_FRONTEND_TYPE === "web" && (
+                                    <Button
+                                        variant="outline-secondary"
+                                        className="ms-auto mt-3"
+                                        onClick={() => {dispatch(logout())}}
+                                    >Отключиться</Button>
+                                )}
+
+                                {process.env.REACT_APP_FRONTEND_TYPE === "local" && (
+                                    <>
+                                        <Button
+                                            variant="outline-secondary"
+                                            className="ms-auto"
+                                            onClick={() => {setShowChangePasswordModal(true)}}
+                                        >Сменить пароль</Button>
+                                        <ChangePasswordModal
+                                            show={showChangePasswordModal}
+                                            onHide={() => setShowChangePasswordModal(false)}
+                                        />
+                                    </>
+                                )}
                             </Offcanvas.Body>
                         </Navbar.Offcanvas>
                     </>
