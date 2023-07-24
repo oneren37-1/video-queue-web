@@ -43,6 +43,7 @@ const ChangePasswordModal = (props: any) => {
         <Modal.Body>
             <Form onSubmit={handleSubmit(onSubmit)}>
                 <Form.Group className="mb-3">
+                    <Form.Label>После смены пароля программа перезагрузится</Form.Label>
                     <Form.Control
                         type="text"
                         placeholder="Новый пароль"

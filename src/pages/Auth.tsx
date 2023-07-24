@@ -31,6 +31,12 @@ const Auth = () => {
     }
 
     React.useEffect(() => {
+        if (process.env.REACT_APP_FRONTEND_TYPE == "local") {
+            window.location.href = "/";
+        }
+    }, [])
+
+    React.useEffect(() => {
         if (authStatus === 'ok') navigate('/')
     }, [authStatus])
 

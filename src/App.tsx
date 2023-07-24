@@ -18,8 +18,6 @@ function App() {
   const authStatus = useSelector((state: RootState) => state.auth.status);
   useWebsocket();
 
-  console.log(process.env)
-
   if (process.env.REACT_APP_FRONTEND_TYPE == "local") {
       window.localStorage.setItem('auth', '{"hostId":"local","hostPassword":"local"}');
   }
@@ -30,7 +28,7 @@ function App() {
               <Route path=":id" element={<Display />} />
           </Route>
           <Route path="/logs" element={<LogsPage />} />
-          {process.env.REACT_APP_FRONTEND_TYPE == "web" && (<Route path="/auth" element={<Auth />} />)}
+          <Route path="/auth" element={<Auth />} />
           <Route path="/media" element={<Media />} />
           <Route path="/queues" element={<Queues />} />
           <Route path="/queue/:id" element={<QueuePage />} />

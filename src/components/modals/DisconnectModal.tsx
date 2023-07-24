@@ -11,6 +11,11 @@ const DisconnectModal = (props: any) => {
     const dispatch = useAppDispatch();
 
     const handleAuth = () => {
+        if (process.env.REACT_APP_FRONTEND_TYPE === "local") {
+            navigate("/");
+            props.onHide();
+            return;
+        }
         dispatch(logout())
         navigate("/auth")
     }

@@ -11,12 +11,13 @@ const WSPort = 6969;
 const server = http.createServer(express);
 const wss = new WebSocket.Server({ server })
 
-node_app.use(express.static(path.join(absPath, 'build')));
+// node_app.use(express.static(path.join(absPath, 'build')));
+node_app.use(express.static(path.join(process.cwd(), 'build')));
 
 node_app.get('*', (req, res) => {
-    // res.sendFile(path.join(process.cwd(), 'build', 'index.html'));
-    console.log("Serving index.html")
-    res.sendFile(path.join(absPath, 'build', 'index.html'));
+    res.sendFile(path.join(process.cwd(), 'build', 'index.html'));
+    // console.log("Serving index.html")
+    // res.sendFile(path.join(absPath, 'build', 'index.html'));
 });
 
 

@@ -51,6 +51,7 @@ const PageLayout = (props: any) => {
             )}
             <DisconnectModal
                 show={disconnect}
+                onHide={() => setDisconnect(false)}
             />
         </>
     )
