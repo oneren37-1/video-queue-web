@@ -61,6 +61,9 @@ export const mediaSlice = createSlice({
             .addCase(loadMediaCount.rejected, (state, action) => {
                 state.count = 0;
             })
+            .addCase(deleteMedia.fulfilled, (state, action) => {
+                state.media = state.media.filter((media) => media.id !== action.payload);
+            })
     }
 })
 
@@ -100,6 +103,17 @@ export const editMedia = createAsyncThunk(
                 duration: data.duration,
             })
         }).then(() => data)
+    });
+
+export const deleteMedia = createAsyncThunk(
+    'media/delete',
+    async (id: string): Promise<any> => {
+        console.log(id)
+        return useWSAuthedRequest({
+            type: "delete",
+            entity: "content",
+            id: id,
+        }).then(() => id);
     });
 
 export default mediaSlice.reducer;

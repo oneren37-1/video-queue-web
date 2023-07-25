@@ -79,6 +79,7 @@ const MediaList = (props: any) => {
                             <Col key={i} className="d-flex justify-content-center">
                                 <MediaCard m={m}
                                            ToggleMediaPick={props.ToggleMediaPick}
+                                           noEdit={!!props.ToggleMediaPick}
                                            isSelected={ SelectedMedia && SelectedMedia.indexOf(m.id) !== -1 }
                                 />
                             </Col>
