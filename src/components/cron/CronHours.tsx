@@ -20,7 +20,9 @@ const CronHours = (props: ICronProps) => {
     const [
         periodicallyValue,
         setPeriodicallyValue
-    ] = useState<string[]>(initialTab === "periodically" ? state.split("/") : ["1", "0"]);
+    ] = useState<string[]>(initialTab === "periodically"
+        ? [state.split("/")[1], state.split("/")[0]]
+        : ["1", "0"]);
     const [
         intervalValue,
         setIntervalValue
