@@ -65,6 +65,13 @@ export const displaysSlice = createSlice({
                 console.log("loadDisplays.rejected");
                 console.log(action.payload)
             })
+            .addCase(changeScheduler.fulfilled, (state, action) => {
+                const {displayId, schedulerId} = action.payload;
+                const display = state.displays.find(display => display.id === displayId);
+                if (display) {
+                    display.scheduler = schedulerId;
+                }
+            })
     }
 })
 
@@ -79,7 +86,7 @@ export const changeScheduler = createAsyncThunk(
                 action: "changeScheduler",
                 schedulerId: args.schedulerId
             })
-        })
+        }).then(() => args)
     })
 
 export const loadDisplays = createAsyncThunk(
