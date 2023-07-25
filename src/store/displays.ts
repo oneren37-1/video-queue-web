@@ -72,6 +72,13 @@ export const displaysSlice = createSlice({
                     display.scheduler = schedulerId;
                 }
             })
+            .addCase(renameDisplay.fulfilled, (state, action) => {
+                const {id, name} = action.payload;
+                const display = state.displays.find(display => display.id === id);
+                if (display) {
+                    display.name = name;
+                }
+            })
     }
 })
 
@@ -88,6 +95,21 @@ export const changeScheduler = createAsyncThunk(
             })
         }).then(() => args)
     })
+
+export const renameDisplay = createAsyncThunk(
+    'displays/rename',
+    async (args: {id: string, name: string}): Promise<any> => {
+        return useWSAuthedRequest({
+            type: "update",
+            entity: "display",
+            id: args.id,
+            payload: JSON.stringify({
+                action: "rename",
+                name: args.name
+            })
+        }).then(() => args)
+
+    });
 
 export const loadDisplays = createAsyncThunk(
     'displays/load',

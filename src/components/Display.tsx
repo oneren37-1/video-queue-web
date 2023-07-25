@@ -6,12 +6,15 @@ import {changeScheduler, setCurrentMedia, setDisplayStatus} from "../store/displ
 import {changeDefaultQueue, loadScheduler} from "../store/scheduler";
 import {loadSchedulers} from "../store/schedulers";
 import MediaCard from "./MediaCard";
+import RenameDisplayModal from "./modals/RenameDisplayModal";
 
 const Display = () => {
 
     const { id } = useParams();
     const name = useAppSelector((state) => state.displays.displays.find(display => display.id === id)?.name);
     const status = useAppSelector((state) => state.displays.displays.find(display => display.id === id)?.status);
+
+    const [renameModalShow, setRenameModalShow] = React.useState(false);
 
     const handlePause = () => handleSignal("pause", id)
     const handleResume = () => handleSignal("resume", id)
@@ -46,15 +49,6 @@ const Display = () => {
         },
         ...useAppSelector((state) => state.schedulers.schedulers)];
 
-    const statusText = {
-        "unknown": "Статус неизвестен",
-        "offline": "Недоступен",
-        "stopped": "Выключен",
-        "playing": "Работает",
-        "paused": "На паузе",
-        undefined: "Статус неизвестен"
-    }
-
     const getStatusText = (status: string | undefined) => {
         switch (status) {
             case "unknown": return "Статус неизвестен";
@@ -73,8 +67,26 @@ const Display = () => {
             )}
             {id && (
                 <>
-                    <h1>{name}</h1>
-                    {/*<h1>{schedulerId}</h1>*/}
+                    <h1>
+                        {name}
+                        {"  "}
+                        <Button
+                            variant={"outline-secondary"}
+                            onClick={() => setRenameModalShow(true)}
+                            className={"ml-3"}
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                 className="bi bi-pencil-fill" viewBox="0 0 16 16">
+                                <path
+                                    d="M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708l-3-3zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207l6.5-6.5zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.499.499 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11l.178-.178z"/>
+                            </svg>
+                        </Button>
+                        <RenameDisplayModal
+                            show={renameModalShow}
+                            onHide={() => setRenameModalShow(false)}
+                            id={id}
+                        />
+                    </h1>
                     <h3>{getStatusText(status)}</h3>
 
                     <ButtonGroup size={"lg"}>
@@ -142,7 +154,7 @@ const Display = () => {
                                 size="sm" variant="outline-primary" className="pb-2">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                                      className="bi bi-arrow-clockwise" viewBox="0 0 16 16">
-                                    <path fill-rule="evenodd"
+                                    <path fillRule="evenodd"
                                           d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"/>
                                     <path
                                         d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"/>
