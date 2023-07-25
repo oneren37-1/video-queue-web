@@ -7,6 +7,7 @@ export type Display = {
     id: string;
     name: string;
     scheduler: string | null;
+    status: "unknown" | "offline" | "playing" | "paused" | "stopped"
     currentMedia: {
         name: string;
         id: string;
@@ -36,6 +37,14 @@ export const displaysSlice = createSlice({
             if (display) {
                 display.currentMedia = { name, id, queueName, queueId, duration };
             }
+        },
+        setDisplayStatus(state, action) {
+            const { displayId, status } = action.payload
+            const display = state.displays
+                .find(display => display.id === displayId);
+            if (display) {
+                display.status = status;
+            }
         }
     },
     extraReducers: (builder) => {
@@ -46,6 +55,7 @@ export const displaysSlice = createSlice({
             .addCase(loadDisplays.fulfilled, (state, action) => {
                 state.status = 'ok';
                 state.displays = JSON.parse(action.payload.payload).map((e: any) => {
+                    console.log(e)
                     e.currentMedia = JSON.parse(e.currentMedia)
                     return e
                 });
@@ -83,5 +93,8 @@ export const loadDisplays = createAsyncThunk(
     }
 )
 
-export const { setCurrentMedia } = displaysSlice.actions;
+export const {
+    setCurrentMedia,
+    setDisplayStatus
+} = displaysSlice.actions;
 export default displaysSlice.reducer;
